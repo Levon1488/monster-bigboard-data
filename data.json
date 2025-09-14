@@ -1,0 +1,18 @@
+{
+  "items": [
+    {
+      "section": "A. Tipy & Monitoring",
+      "type": "ONLINE",
+      "audience": "BOTH",
+      "title": "Fresh Pack – Okresní monitoring",
+      "short": "Denní sledování nových nabídek v okrese.",
+      "what": "Automatické tahání portálů + úředních zdrojů.",
+      "how": "Doručení 7:30 / 16:00 do WhatsApp/Telegram + CSV.",
+      "why": "Příležitosti chytáš dřív než konkurence.",
+      "icon": "mdi:map-search-outline",
+      "url": "#",
+      "tags": "monitoring,okres,alerty"
+    }
+  ]
+}
+
