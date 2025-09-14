@@ -6,13 +6,38 @@
       "audience": "BOTH",
       "title": "Fresh Pack – Okresní monitoring",
       "short": "Denní sledování nových nabídek v okrese.",
-      "what": "Automatické tahání portálů + úředních zdrojů.",
+      "what": "Automatický monitoring portálů a úředních zdrojů.",
       "how": "Doručení 7:30 / 16:00 do WhatsApp/Telegram + CSV.",
-      "why": "Příležitosti chytáš dřív než konkurence.",
+      "why": "Nesjíždíš ručně inzerci. Příležitosti dřív než ostatní.",
       "icon": "mdi:map-search-outline",
       "url": "#",
-      "tags": "monitoring,okres,alerty"
+      "tags": "monitoring,tipy,okres"
+    },
+    {
+      "section": "C. Šablony & Kalkulátory",
+      "type": "ONLINE",
+      "audience": "INVESTOR",
+      "title": "Business plan (pro banku)",
+      "short": "Word/PPT šablona pro úvěrový případ.",
+      "what": "Executive summary, trh, cashflow, zajištění.",
+      "how": "Stáhneš, vyplníš, export do PDF.",
+      "why": "Ušetří čas, vypadá profi; bankéř rozumí.",
+      "icon": "mdi:file-document-edit-outline",
+      "url": "#",
+      "tags": "banka,plán,šablona"
+    },
+    {
+      "section": "G. Custom služby",
+      "type": "PREMIUM",
+      "audience": "BOTH",
+      "title": "Full due diligence",
+      "short": "Kompletní právní/technická prověrka.",
+      "what": "Advokát + technik; fyzická obhlídka.",
+      "how": "Výstup PDF + call; 3–5 dní.",
+      "why": "Minimalizuješ průšvih před koupí.",
+      "icon": "mdi:shield-check-outline",
+      "url": "#",
+      "tags": "služba,prověrka"
     }
   ]
 }
-
