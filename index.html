@@ -3,68 +3,226 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Digitální Tržiště</title>
-<base href="/monster-bigboard-data/">
+<title>Monster BigBoard - Funkční verze</title>
 <style>
-  :root{--bg:#0f0f0f;--text:#eee;--muted:#bdbdbd;--card:#1b1b1b;--card2:#262626;--line:#2a2a2a;--accent:#ffcc00;--sidebar:#141414;--sideW:300px}
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-  .wrap{display:grid;grid-template-columns:var(--sideW) 1fr;grid-template-rows:64px 1fr;grid-template-areas:"head head" "side main";height:100%}
-  header{grid-area:head;display:flex;align-items:center;justify-content:center;background:#101010;border-bottom:1px solid #1f1f1f;position:sticky;top:0;z-index:5}
-  h1{margin:0;color:var(--accent)}
-  .topright{position:absolute;right:12px;top:10px;display:flex;gap:8px;align-items:center}
-  .btn{background:var(--card);border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:8px;cursor:pointer}
-  .btn:hover{background:var(--card2)}
-  .search{background:#111;border:1px solid var(--line);color:#ddd;border-radius:8px;padding:8px 10px;min-width:260px;outline:none}
-  aside{grid-area:side;background:var(--sidebar);border-right:1px solid #1f1f1f;padding:12px;overflow:auto;position:sticky;top:64px;height:calc(100vh - 64px)}
-  .cat{display:block;padding:10px 12px;margin-bottom:8px;border-radius:10px;background:#171717;border:1px solid #242424;text-decoration:none;color:var(--text);cursor:pointer}
-  .cat.active{outline:2px solid var(--accent)}
-  .small{display:block;color:var(--muted);margin-top:2px;font-size:.9em}
-  main{grid-area:main;overflow:auto;padding:16px;transform-origin:0 0}
-  .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;min-width:980px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;transition:.15s;cursor:pointer}
-  .card:hover{background:var(--card2);transform:translateY(-1px)}
-  .icon{width:36px;height:36px;flex:0 0 36px;border-radius:8px;background:#101010;display:flex;align-items:center;justify-content:center}
-  .num{color:var(--accent);font-weight:700;margin-bottom:6px}
-  .title{font-weight:700}
-  .sub{color:var(--muted);margin-top:6px;font-size:.95em}
-  .hidden{display:none}
-  .col-1{grid-column:span 1}.col-2{grid-column:span 2}.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-5{grid-column:span 5}.col-6{grid-column:span 6}
-  .col-7{grid-column:span 7}.col-8{grid-column:span 8}.col-9{grid-column:span 9}.col-10{grid-column:span 10}.col-11{grid-column:span 11}.col-12{grid-column:span 12}
-  .infobar{position:sticky;bottom:0;background:rgba(20,20,20,.9);border-top:1px solid #1f1f1f;padding:8px 12px;font-size:.9em;color:#ccc}
+  body{margin:0;background:#0f0f0f;color:#eee;font-family:Arial,sans-serif}
+  .container{max-width:1400px;margin:0 auto;padding:20px}
+  h1{color:#ffcc00;text-align:center}
+  .filters{background:#1b1b1b;padding:15px;border-radius:8px;margin-bottom:20px}
+  .filters input{padding:8px;margin-right:10px;background:#262626;border:1px solid #444;color:#fff;border-radius:4px}
+  .stats{background:#1b1b1b;padding:10px;margin-bottom:20px;border-radius:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px}
+  .card{background:#1b1b1b;border:1px solid #2a2a2a;padding:15px;border-radius:8px;cursor:pointer;transition:0.3s}
+  .card:hover{background:#262626;transform:translateY(-2px)}
+  .card h3{color:#ffcc00;margin:0 0 10px 0}
+  .card .type{display:inline-block;padding:3px 8px;border-radius:4px;font-size:12px;margin-bottom:10px}
+  .type-ONLINE{background:#2e7d32;color:white}
+  .type-PREMIUM{background:#6a1b9a;color:white}
+  .type-CUSTOM{background:#d84315;color:white}
+  .card .audience{float:right;font-size:18px}
+  .card p{color:#bdbdbd;margin:5px 0;font-size:14px}
+  .error{background:#d32f2f;color:white;padding:20px;border-radius:8px;text-align:center}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Digitální Tržiště</h1>
-      <div class="topright">
-        <input id="q" class="search" placeholder="Hledat (název, číslo, tagy)…">
-        <button id="zminus" class="btn">−</button>
-        <button id="zplus"  class="btn">+</button>
-        <button id="zreset" class="btn">100%</button>
-      </div>
-    </header>
-    <aside id="sidebar"></aside>
-    <main id="main">
-      <div id="grid" class="grid"></div>
-      <div id="info" class="infobar"></div>
-    </main>
+<div class="container">
+  <h1>🚀 Monster BigBoard - Digitální Tržiště</h1>
+
+  <div class="filters">
+    <input type="text" id="search" placeholder="Hledat produkty...">
+    <select id="typeFilter">
+      <option value="">Všechny typy</option>
+      <option value="ONLINE">Online</option>
+      <option value="PREMIUM">Premium</option>
+      <option value="CUSTOM">Custom</option>
+    </select>
+    <select id="audienceFilter">
+      <option value="">Všechny cílové skupiny</option>
+      <option value="INVESTOR">Investoři</option>
+      <option value="MAKLER">Makléři</option>
+      <option value="BOTH">Oba</option>
+    </select>
   </div>
 
-  <!-- fallback demo -->
-  <script id="DATA" type="application/json">
-  { "categories": [ { "key":"Úvod","title":"Úvod","items":[
-      { "number":"Ú-01","title":"Co je Digitální Tržiště","subtitle":"Krátké vysvětlení pro nově příchozí","icon":"book-open.svg","layout":{"w":4} },
-      { "number":"Ú-02","title":"Jak přidávat položky","subtitle":"Přidáš řádek do JSONu, nic víc","icon":"plus.svg","layout":{"w":4} },
-      { "number":"Ú-03","title":"Kontakt přes bota","subtitle":"Otevře se formulář","icon":"chat.svg","layout":{"w":4} }
-  ] } ] }
-  </script>
+  <div class="stats" id="stats">Načítám produkty...</div>
+  <div class="grid" id="grid"></div>
+</div>
 
-  <script>
-    // ---------- načtení dat: market.json -> final_catalog.json -> fallback ----------
-    async function loadData(){
-      const urls = [']()
+<script>
+// DEMO DATA - funguje okamžitě bez externích souborů
+const PRODUCTS = [
+  {
+    section: "A. Tipy na nemovitosti",
+    type: "ONLINE",
+    audience: "BOTH",
+    title: "Fresh Pack – Okresní monitoring",
+    short: "Denní sledování nových nabídek v okrese",
+    what: "Automatický monitoring všech realitních portálů a úředních zdrojů pro váš vybraný okres",
+    how: "Doručení 2x denně (7:30 a 16:00) přes WhatsApp/Telegram + CSV soubor",
+    why: "Získáte příležitosti dřív než konkurence, nemusíte ručně procházet desítky zdrojů"
+  },
+  {
+    section: "A. Tipy na nemovitosti",
+    type: "PREMIUM",
+    audience: "INVESTOR",
+    title: "VIP Hunter – Exkluzivní nabídky",
+    short: "Přednostní přístup k off-market nemovitostem",
+    what: "Síť kontaktů napříč ČR hlásí nemovitosti ještě před zveřejněním",
+    how: "Okamžité upozornění 24/7 + osobní konzultace",
+    why: "Nejlepší deals nikdy nejdou na veřejný trh"
+  },
+  {
+    section: "B. Databáze",
+    type: "ONLINE",
+    audience: "MAKLER",
+    title: "Databáze majitelů nemovitostí",
+    short: "Kontakty na majitele podle lokality",
+    what: "Ověřené kontakty včetně telefonů a emailů",
+    how: "Excel export, měsíční aktualizace",
+    why: "Přímé oslovení = vyšší provize"
+  },
+  {
+    section: "B. Databáze",
+    type: "CUSTOM",
+    audience: "BOTH",
+    title: "Custom databáze na míru",
+    short: "Databáze podle vašich specifických kritérií",
+    what: "Vytvoříme databázi přesně podle vašich potřeb",
+    how: "Jednorázové dodání nebo pravidelné aktualizace",
+    why: "Získáte přesně ta data, která potřebujete"
+  },
+  {
+    section: "C. Nástroje a šablony",
+    type: "ONLINE",
+    audience: "MAKLER",
+    title: "Sada profesionálních smluv",
+    short: "150+ právně ověřených šablon",
+    what: "Kompletní sada smluv pro realitní obchody",
+    how: "Okamžité stažení, Word/PDF formát",
+    why: "Ušetříte za právníka, vše ověřené praxí"
+  },
+  {
+    section: "C. Nástroje a šablony",
+    type: "PREMIUM",
+    audience: "INVESTOR",
+    title: "ROI Kalkulátor Pro",
+    short: "Pokročilý nástroj pro analýzu investic",
+    what: "Excel nástroj s 50+ metrikami pro hodnocení nemovitostí",
+    how: "Download + video tutoriál + podpora",
+    why: "Profesionální analýza = lepší investiční rozhodnutí"
+  },
+  {
+    section: "D. Vzdělávání",
+    type: "ONLINE",
+    audience: "BOTH",
+    title: "Realitní akademie - základy",
+    short: "Online kurz pro začátečníky",
+    what: "20 hodin video obsahu + pracovní sešity",
+    how: "Přístup na 12 měsíců, vlastní tempo",
+    why: "Naučte se od profesionálů z praxe"
+  },
+  {
+    section: "D. Vzdělávání",
+    type: "PREMIUM",
+    audience: "INVESTOR",
+    title: "Masterclass - Flipping nemovitostí",
+    short: "Intenzivní workshop o rychlém prodeji",
+    what: "2denní workshop + 3 měsíce mentoringu",
+    how: "Osobně v Praze nebo online",
+    why: "Naučte se vydělávat na rychlých obchodech"
+  }
+];
+
+// Funkce pro zobrazení produktů
+function displayProducts(products) {
+  const grid = document.getElementById('grid');
+  const stats = document.getElementById('stats');
+
+  if (products.length === 0) {
+    grid.innerHTML = '<div class="error">Žádné produkty nenalezeny</div>';
+    stats.textContent = 'Zobrazeno: 0 produktů';
+    return;
+  }
+
+  grid.innerHTML = products.map(product => {
+    const audienceIcon = product.audience === 'BOTH' ? '👥' : 
+                        product.audience === 'INVESTOR' ? '💰' : '🏠';
+
+    return `
+      <div class="card">
+        <span class="audience" title="${product.audience}">${audienceIcon}</span>
+        <span class="type type-${product.type}">${product.type}</span>
+        <h3>${product.title}</h3>
+        <p><strong>${product.short}</strong></p>
+        <p><small>Co: ${product.what}</small></p>
+        <p><small>Jak: ${product.how}</small></p>
+        <p><small>Proč: ${product.why}</small></p>
+      </div>
+    `;
+  }).join('');
+
+  // Statistiky
+  const sections = [...new Set(products.map(p => p.section))];
+  stats.innerHTML = `
+    Zobrazeno: <strong>${products.length} produktů</strong> | 
+    Kategorie: <strong>${sections.length}</strong> | 
+    Online: ${products.filter(p => p.type === 'ONLINE').length} | 
+    Premium: ${products.filter(p => p.type === 'PREMIUM').length} | 
+    Custom: ${products.filter(p => p.type === 'CUSTOM').length}
+  `;
+}
+
+// Filtrování
+function filterProducts() {
+  const searchTerm = document.getElementById('search').value.toLowerCase();
+  const typeFilter = document.getElementById('typeFilter').value;
+  const audienceFilter = document.getElementById('audienceFilter').value;
+
+  let filtered = PRODUCTS;
+
+  if (searchTerm) {
+    filtered = filtered.filter(p => 
+      p.title.toLowerCase().includes(searchTerm) ||
+      p.short.toLowerCase().includes(searchTerm) ||
+      p.what.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  if (typeFilter) {
+    filtered = filtered.filter(p => p.type === typeFilter);
+  }
+
+  if (audienceFilter) {
+    filtered = filtered.filter(p => p.audience === audienceFilter || p.audience === 'BOTH');
+  }
+
+  displayProducts(filtered);
+}
+
+// Event listenery
+document.getElementById('search').addEventListener('input', filterProducts);
+document.getElementById('typeFilter').addEventListener('change', filterProducts);
+document.getElementById('audienceFilter').addEventListener('change', filterProducts);
+
+// Inicializace
+displayProducts(PRODUCTS);
+
+// Pokus o načtení externích dat
+fetch('https://raw.githubusercontent.com/Levon1488/monster-bigboard-data/main/final_catalog.json')
+  .then(response => response.json())
+  .then(data => {
+    if (Array.isArray(data) && data.length > 0) {
+      PRODUCTS.push(...data);
+      displayProducts(PRODUCTS);
+      console.log('Externí data načtena:', data.length, 'produktů');
+    }
+  })
+  .catch(error => console.log('Používám demo data, externí data nejsou dostupná'));
+</script>
+</body>
+</html>
+
+
 
 
 
