@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VIP Dashboard - Monster BigBoard</title>
+<title>Monster BigBoard - VIP Dashboard</title>
 <style>
   :root{--bg:#0f0f0f;--text:#eee;--muted:#bdbdbd;--card:#1b1b1b;--card2:#262626;--line:#2a2a2a;--accent:#ffcc00;--sidebar:#141414}
   *{box-sizing:border-box}html,body{height:100%;margin:0}
@@ -16,48 +16,69 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;cursor:pointer;transition:0.3s;position:relative}
   .card:hover{background:var(--card2);transform:translateY(-2px)}
-  .badge{position:absolute;top:10px;right:10px;background:var(--accent);color:#000;padding:2px 8px;border-radius:4px;font-size:0.75em;font-weight:bold}
+  .badge{position:absolute;top:10px;right:10px;padding:2px 8px;border-radius:4px;font-size:0.7em;font-weight:bold;color:#000}
+  .badge.ONLINE{background:#4caf50}
+  .badge.PREMIUM{background:#9c27b0}
+  .badge.CUSTOM{background:#ff9800}
   .icon{font-size:2em;margin-bottom:10px}
-  .title{font-weight:bold;margin-bottom:5px}
-  .subtitle{color:var(--muted);font-size:0.9em}
-  .price{color:var(--accent);margin-top:10px;font-weight:bold}
-  .category{padding:10px;margin:5px 0;background:#1a1a1a;border-radius:8px;cursor:pointer}
+  .title{font-weight:bold;margin-bottom:5px;color:var(--accent)}
+  .subtitle{color:var(--muted);font-size:0.9em;line-height:1.3}
+  .details{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:0.85em;color:#999}
+  .category{padding:12px;margin:5px 0;background:#1a1a1a;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between}
   .category:hover{background:#222}
-  .category.active{border:2px solid var(--accent)}
+  .category.active{border:2px solid var(--accent);padding:10px}
   .search{background:#111;border:1px solid #333;color:#fff;padding:8px;border-radius:6px;width:300px}
   .btn{background:var(--card);border:1px solid var(--line);color:var(--text);padding:8px 15px;border-radius:6px;cursor:pointer;margin:0 5px}
   .btn:hover{background:var(--card2)}
-
-  /* Chat Bot */
-  .chat-widget{position:fixed;bottom:20px;right:20px;width:350px;height:500px;background:var(--card);border:2px solid var(--accent);border-radius:12px;display:none;flex-direction:column;z-index:1000}
+  .stats{background:#1a1a1a;padding:10px 20px;margin-bottom:20px;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+  .chat-widget{position:fixed;bottom:20px;right:20px;width:350px;height:500px;background:var(--card);border:2px solid var(--accent);border-radius:12px;display:none;flex-direction:column;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.5)}
   .chat-widget.open{display:flex}
-  .chat-header{background:var(--accent);color:#000;padding:15px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}
+  .chat-header{background:var(--accent);color:#000;padding:15px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;border-radius:10px 10px 0 0}
   .chat-messages{flex:1;overflow-y:auto;padding:15px}
   .chat-input-area{display:flex;padding:10px;border-top:1px solid var(--line)}
   .chat-input{flex:1;background:#111;border:1px solid #333;color:#fff;padding:8px;border-radius:6px}
-  .bot-toggle{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.5em;z-index:999}
+  .bot-toggle{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.5em;z-index:999;box-shadow:0 3px 10px rgba(255,204,0,0.3)}
+  .bot-toggle:hover{transform:scale(1.1)}
+  .filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+  .filter-btn{padding:6px 12px;background:#1a1a1a;border:1px solid #333;border-radius:6px;cursor:pointer;font-size:0.9em}
+  .filter-btn:hover{background:#222}
+  .filter-btn.active{background:var(--accent);color:#000;border-color:var(--accent)}
 </style>
 </head>
 <body>
 
 <div class="container">
   <header>
-    <h1>🚀 Monster BigBoard - VIP Dashboard</h1>
+    <h1>🚀 Monster BigBoard</h1>
     <div>
-      <input type="text" class="search" id="searchInput" placeholder="Hledat produkty...">
-      <button class="btn" onclick="toggleZoom(-0.1)">➖</button>
-      <button class="btn" onclick="toggleZoom(0.1)">➕</button>
-      <button class="btn" id="zoomLevel">100%</button>
+      <input type="text" class="search" id="searchInput" placeholder="Hledat v produktech...">
+      <select id="typeFilter" class="btn">
+        <option value="">Všechny typy</option>
+        <option value="ONLINE">Online</option>
+        <option value="PREMIUM">Premium</option>
+        <option value="CUSTOM">Custom</option>
+      </select>
+      <button class="btn" onclick="location.reload()">🔄 Obnovit</button>
     </div>
   </header>
 
   <div class="sidebar" id="sidebar">
-    <h3 style="color:var(--accent)">Kategorie</h3>
-    <div id="categories"></div>
+    <h3 style="color:var(--accent);margin-top:0">📁 Kategorie</h3>
+    <div id="categories">
+      <div style="color:#666;padding:20px">Načítám kategorie...</div>
+    </div>
   </div>
 
   <div class="main" id="main">
-    <div class="grid" id="productGrid"></div>
+    <div class="stats" id="stats">
+      <span>Načítám produkty...</span>
+    </div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="grid" id="productGrid">
+      <div style="color:#666;padding:40px;text-align:center">
+        ⏳ Načítám data z JSON souborů...
+      </div>
+    </div>
   </div>
 </div>
 
@@ -70,173 +91,269 @@
   </div>
   <div class="chat-messages" id="chatMessages">
     <div style="background:#222;padding:10px;border-radius:8px;margin-bottom:10px">
-      Ahoj! Jsem VIP asistent. Jak vám mohu pomoci?
+      👋 Ahoj! Jsem VIP asistent. Jak vám mohu pomoci s výběrem produktů?
     </div>
   </div>
   <div class="chat-input-area">
     <input type="text" class="chat-input" id="chatInput" placeholder="Napište zprávu..." onkeypress="if(event.key==='Enter')sendMessage()">
-    <button class="btn" onclick="sendMessage()">Odeslat</button>
+    <button class="btn" onclick="sendMessage()" style="background:var(--accent);color:#000">Odeslat</button>
   </div>
 </div>
 
 <script>
-// Data produktů - načte se z vašich JSON souborů
-let products = [];
-let categories = new Set();
+// Globální proměnné
+let allProducts = [];
+let categories = {};
 let currentCategory = 'all';
-let zoom = 1;
+let currentFilters = {
+  type: '',
+  audience: '',
+  search: ''
+};
 
-// Načtení dat z JSON
-async function loadData() {
-  try {
-    // Zkusí načíst vaše data
-    const response = await fetch('final_catalog.json');
-    if (response.ok) {
-      const data = await response.json();
-      processData(data);
-    } else {
-      loadDemoData();
-    }
-  } catch (error) {
-    console.log('Načítám demo data...');
-    loadDemoData();
-  }
-}
+// HLAVNÍ NAČÍTACÍ FUNKCE - OPRAVENÁ PRO VAŠE DATA
+async function initApp() {
+  console.log('🚀 Spouštím aplikaci...');
 
-// Demo data pro testování
-function loadDemoData() {
-  const demoData = [
-    {
-      section: "Tipy na nemovitosti",
-      type: "ONLINE",
-      title: "Fresh Pack - Monitoring", 
-      short: "Denní sledování nových nabídek",
-      price: "2900 Kč/měsíc",
-      icon: "🏠"
-    },
-    {
-      section: "Databáze",
-      type: "PREMIUM",
-      title: "Databáze investorů",
-      short: "5000+ ověřených kontaktů",
-      price: "9900 Kč",
-      icon: "📊"
-    },
-    {
-      section: "Nástroje",
-      type: "CUSTOM",
-      title: "ROI Kalkulátor Pro",
-      short: "Excel nástroj pro analýzu investic",
-      price: "4900 Kč",
-      icon: "📈"
-    },
-    {
-      section: "Tipy na nemovitosti",
-      type: "ONLINE",
-      title: "VIP Hunter",
-      short: "Exkluzivní off-market nabídky",
-      price: "5900 Kč/měsíc",
-      icon: "💎"
-    },
-    {
-      section: "Vzdělávání",
-      type: "PREMIUM",
-      title: "Masterclass Flipping",
-      short: "2denní intenzivní workshop",
-      price: "19900 Kč",
-      icon: "🎓"
-    },
-    {
-      section: "Nástroje",
-      type: "ONLINE",
-      title: "Sada smluv Pro",
-      short: "150+ právně ověřených šablon",
-      price: "3900 Kč",
-      icon: "📝"
-    }
+  // Cesty k souborům
+  const basePath = window.location.hostname.includes('github.io') 
+    ? '/monster-bigboard-data/' 
+    : './';
+
+  const files = [
+    'final_catalog.json',
+    'market.json', 
+    'catalog.json',
+    'data.json'
   ];
-  processData(demoData);
-}
 
-// Zpracování dat
-function processData(data) {
-  products = Array.isArray(data) ? data : [data];
+  let dataLoaded = false;
 
-  // Získat kategorie
-  products.forEach(p => {
-    if (p.section) categories.add(p.section);
-  });
+  // Zkus načíst soubory
+  for (const file of files) {
+    try {
+      const url = basePath + file;
+      console.log('📂 Zkouším načíst:', url);
 
+      const response = await fetch(url);
+      if (!response.ok) continue;
+
+      const data = await response.json();
+      console.log(`✅ Načteno z ${file}:`, data);
+
+      // Zpracuj různé formáty dat
+      if (Array.isArray(data)) {
+        // Přímo pole produktů
+        allProducts = data;
+        dataLoaded = true;
+        break;
+      } else if (data.categories) {
+        // Formát s kategoriemi
+        allProducts = [];
+        data.categories.forEach(cat => {
+          if (cat.items) {
+            cat.items.forEach(item => {
+              item.section = item.section || cat.title || cat.key;
+              allProducts.push(item);
+            });
+          }
+        });
+        dataLoaded = true;
+        break;
+      } else if (data.products) {
+        // Formát s products
+        allProducts = data.products;
+        dataLoaded = true;
+        break;
+      }
+    } catch (error) {
+      console.error(`❌ Chyba při načítání ${file}:`, error);
+    }
+  }
+
+  // Pokud se nepodařilo načíst, zkus GitHub raw
+  if (!dataLoaded && window.location.hostname.includes('github.io')) {
+    try {
+      console.log('🌐 Zkouším GitHub raw...');
+      const response = await fetch('https://raw.githubusercontent.com/Levon1488/monster-bigboard-data/main/final_catalog.json');
+      if (response.ok) {
+        allProducts = await response.json();
+        dataLoaded = true;
+      }
+    } catch (error) {
+      console.error('❌ GitHub raw selhal:', error);
+    }
+  }
+
+  // Pokud stále nic, použij demo data
+  if (!dataLoaded || allProducts.length === 0) {
+    console.log('📦 Používám demo data');
+    allProducts = getDemoData();
+  }
+
+  console.log(`✨ Celkem načteno produktů: ${allProducts.length}`);
+
+  // Zpracuj a zobraz data
+  processProducts();
   renderCategories();
   renderProducts();
+  updateStats();
+}
+
+// Demo data jako záloha
+function getDemoData() {
+  return [
+    {section:"A. Tipy na nemovitosti",type:"ONLINE",audience:"BOTH",title:"Fresh Pack – Okresní monitoring",short:"Denní sledování nových nabídek v okrese",what:"Automatický monitoring všech portálů",how:"Doručení 2x denně email/WhatsApp",why:"Získáte příležitosti dřív než konkurence",icon:"🏠"},
+    {section:"A. Tipy na nemovitosti",type:"PREMIUM",audience:"INVESTOR",title:"VIP Hunter",short:"Exkluzivní off-market nabídky",what:"Síť kontaktů hlásí nemovitosti před zveřejněním",how:"Okamžité upozornění 24/7",why:"Nejlepší deals nikdy nejdou na veřejný trh",icon:"💎"},
+    {section:"B. Databáze",type:"ONLINE",audience:"MAKLER",title:"Databáze majitelů",short:"Kontakty na majitele nemovitostí",what:"Ověřené kontakty včetně telefonů a emailů",how:"Excel export, měsíční aktualizace",why:"Přímé oslovení = vyšší provize",icon:"📊"},
+    {section:"C. Nástroje",type:"PREMIUM",audience:"INVESTOR",title:"ROI Kalkulátor Pro",short:"Pokročilý nástroj pro analýzu investic",what:"Excel s 50+ metrikami",how:"Download + video tutoriál",why:"Profesionální analýza investic",icon:"📈"},
+    {section:"D. Vzdělávání",type:"ONLINE",audience:"BOTH",title:"Realitní akademie",short:"Online kurz pro začátečníky",what:"20 hodin video obsahu",how:"Přístup na 12 měsíců",why:"Naučte se od profíků",icon:"🎓"}
+  ];
+}
+
+// Zpracování produktů
+function processProducts() {
+  categories = {};
+
+  allProducts.forEach(product => {
+    const cat = product.section || 'Ostatní';
+    if (!categories[cat]) {
+      categories[cat] = [];
+    }
+    categories[cat].push(product);
+  });
+
+  console.log('📊 Kategorie:', Object.keys(categories));
 }
 
 // Vykreslení kategorií
 function renderCategories() {
   const container = document.getElementById('categories');
-  container.innerHTML = '<div class="category active" onclick="filterCategory(\'all\', this)">🔹 Všechny produkty</div>';
 
-  categories.forEach(cat => {
-    const count = products.filter(p => p.section === cat).length;
-    container.innerHTML += `
-      <div class="category" onclick="filterCategory('${cat}', this)">
-        📁 ${cat} (${count})
+  // Tlačítko pro všechny
+  let html = `
+    <div class="category active" onclick="selectCategory('all', this)">
+      <span>⭐ Všechny produkty</span>
+      <span>${allProducts.length}</span>
+    </div>
+  `;
+
+  // Jednotlivé kategorie
+  Object.keys(categories).sort().forEach(cat => {
+    const count = categories[cat].length;
+    const icon = cat.includes('Tipy') ? '🏠' : 
+                 cat.includes('Databáze') ? '📊' :
+                 cat.includes('Nástroje') ? '🛠️' :
+                 cat.includes('Vzdělávání') ? '🎓' : '📁';
+
+    html += `
+      <div class="category" onclick="selectCategory('${cat}', this)">
+        <span>${icon} ${cat.replace(/^[A-Z]\.\s*/, '')}</span>
+        <span>${count}</span>
       </div>
     `;
   });
+
+  container.innerHTML = html;
 }
 
-// Filtrování podle kategorie
-function filterCategory(category, element) {
+// Výběr kategorie
+function selectCategory(category, element) {
   currentCategory = category;
+
+  // Označ aktivní
   document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
-  element.classList.add('active');
+  if (element) element.classList.add('active');
+
   renderProducts();
+  updateStats();
 }
 
 // Vykreslení produktů
 function renderProducts() {
   const grid = document.getElementById('productGrid');
   const search = document.getElementById('searchInput').value.toLowerCase();
+  const typeFilter = document.getElementById('typeFilter').value;
 
-  let filtered = products;
-
-  // Filtr podle kategorie
-  if (currentCategory !== 'all') {
-    filtered = filtered.filter(p => p.section === currentCategory);
-  }
+  // Filtrování
+  let filtered = currentCategory === 'all' 
+    ? [...allProducts]
+    : categories[currentCategory] || [];
 
   // Filtr podle hledání
   if (search) {
-    filtered = filtered.filter(p => 
-      (p.title && p.title.toLowerCase().includes(search)) ||
-      (p.short && p.short.toLowerCase().includes(search))
-    );
+    filtered = filtered.filter(p => {
+      const searchIn = [
+        p.title, p.short, p.what, p.how, p.why,
+        p.section, p.type, p.audience
+      ].join(' ').toLowerCase();
+      return searchIn.includes(search);
+    });
   }
 
-  // Vykreslit karty
-  grid.innerHTML = filtered.map(product => `
-    <div class="card" onclick="selectProduct('${product.title}')">
-      <div class="badge">${product.type || 'ONLINE'}</div>
-      <div class="icon">${product.icon || '📦'}</div>
-      <div class="title">${product.title || 'Produkt'}</div>
-      <div class="subtitle">${product.short || product.subtitle || ''}</div>
-      <div class="price">${product.price || 'Cena na dotaz'}</div>
-    </div>
-  `).join('');
+  // Filtr podle typu
+  if (typeFilter) {
+    filtered = filtered.filter(p => p.type === typeFilter);
+  }
 
+  // Vykresli karty
   if (filtered.length === 0) {
-    grid.innerHTML = '<div style="color:#666">Žádné produkty nenalezeny</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#666">Žádné produkty nenalezeny 🔍</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(product => {
+    const icon = product.icon || 
+                (product.type === 'ONLINE' ? '🌐' :
+                 product.type === 'PREMIUM' ? '💎' : 
+                 product.type === 'CUSTOM' ? '🔧' : '📦');
+
+    return `
+      <div class="card" onclick="showProduct('${encodeURIComponent(JSON.stringify(product))}')">
+        <div class="badge ${product.type || 'ONLINE'}">${product.type || 'ONLINE'}</div>
+        <div class="icon">${icon}</div>
+        <div class="title">${product.title || 'Bez názvu'}</div>
+        <div class="subtitle">${product.short || product.subtitle || ''}</div>
+        ${product.what ? `<div class="details"><strong>Co:</strong> ${product.what.substring(0,100)}...</div>` : ''}
+        ${product.audience ? `<div class="details"><strong>Pro:</strong> ${product.audience === 'BOTH' ? 'Všechny' : product.audience}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// Zobrazení produktu
+function showProduct(encodedProduct) {
+  try {
+    const product = JSON.parse(decodeURIComponent(encodedProduct));
+    document.getElementById('chatWidget').classList.add('open');
+
+    const message = `
+      <div style="background:#1a1a1a;padding:15px;border-radius:8px;border-left:3px solid var(--accent)">
+        <strong style="color:var(--accent)">${product.title}</strong><br>
+        <small>${product.short || ''}</small><br><br>
+        ${product.what ? `<strong>Co to je:</strong> ${product.what}<br><br>` : ''}
+        ${product.how ? `<strong>Jak to funguje:</strong> ${product.how}<br><br>` : ''}
+        ${product.why ? `<strong>Proč to potřebujete:</strong> ${product.why}` : ''}
+      </div>
+      <div style="margin-top:10px">Mám zájem o tento produkt. Chci více informací nebo rovnou objednat.</div>
+    `;
+
+    addMessage(message, 'bot');
+  } catch (error) {
+    console.error('Chyba při zobrazení produktu:', error);
   }
 }
 
-// Výběr produktu
-function selectProduct(title) {
-  const product = products.find(p => p.title === title);
-  if (product) {
-    document.getElementById('chatWidget').classList.add('open');
-    addMessage(`Zajímá vás "${product.title}"? Cena: ${product.price || 'na dotaz'}. Chcete více informací?`, 'bot');
-  }
+// Aktualizace statistik
+function updateStats() {
+  const filtered = currentCategory === 'all' 
+    ? allProducts.length
+    : (categories[currentCategory] || []).length;
+
+  document.getElementById('stats').innerHTML = `
+    <span>📊 Zobrazeno: <strong>${filtered}</strong> z ${allProducts.length} produktů</span>
+    <span>📁 Kategorie: <strong>${currentCategory === 'all' ? 'Všechny' : currentCategory.replace(/^[A-Z]\.\s*/, '')}</strong></span>
+  `;
 }
 
 // Chat funkce
@@ -252,15 +369,19 @@ function sendMessage() {
   addMessage(message, 'user');
   input.value = '';
 
-  // Simulace odpovědi bota
+  // Bot odpověď
   setTimeout(() => {
-    if (message.toLowerCase().includes('cena')) {
-      addMessage('Ceny našich produktů začínají od 2900 Kč. Který produkt vás zajímá?', 'bot');
-    } else if (message.toLowerCase().includes('koupit')) {
-      addMessage('Super! Připravím pro vás objednávku. Napište mi váš email a telefon.', 'bot');
-    } else {
-      addMessage('Děkuji za zprávu. Předám ji našemu týmu a ozveme se do 24 hodin.', 'bot');
+    let response = 'Děkuji za zprávu. Náš tým vám odpoví do 24 hodin.';
+
+    if (message.toLowerCase().includes('cena') || message.toLowerCase().includes('kolik')) {
+      response = 'Ceny našich produktů jsou individuální podle rozsahu. Napište mi, který produkt vás zajímá, a pošlu vám konkrétní nabídku.';
+    } else if (message.toLowerCase().includes('koupit') || message.toLowerCase().includes('objednat')) {
+      response = 'Skvělé! Pro objednávku prosím napište:<br>1. Název produktu<br>2. Váš email<br>3. Telefon<br><br>Ozveme se vám do 1 hodiny.';
+    } else if (message.toLowerCase().includes('ahoj') || message.toLowerCase().includes('dobrý')) {
+      response = 'Dobrý den! Jak vám mohu pomoci? Hledáte nějaký konkrétní produkt nebo potřebujete poradit?';
     }
+
+    addMessage(response, 'bot');
   }, 1000);
 }
 
@@ -271,27 +392,27 @@ function addMessage(text, sender) {
     ? 'text-align:right;margin:10px 0' 
     : 'margin:10px 0';
   messageDiv.innerHTML = `
-    <span style="background:${sender === 'user' ? '#333' : '#222'};padding:10px;border-radius:8px;display:inline-block">
+    <div style="background:${sender === 'user' ? '#333' : '#222'};padding:12px;border-radius:8px;display:inline-block;max-width:80%">
       ${text}
-    </span>
+    </div>
   `;
   messages.appendChild(messageDiv);
   messages.scrollTop = messages.scrollHeight;
 }
 
-// Zoom funkce
-function toggleZoom(delta) {
-  zoom = Math.max(0.5, Math.min(2, zoom + delta));
-  document.getElementById('main').style.transform = `scale(${zoom})`;
-  document.getElementById('main').style.transformOrigin = '0 0';
-  document.getElementById('zoomLevel').textContent = Math.round(zoom * 100) + '%';
-}
-
 // Event listeners
-document.getElementById('searchInput').addEventListener('input', renderProducts);
+document.getElementById('searchInput').addEventListener('input', () => {
+  renderProducts();
+  updateStats();
+});
 
-// Inicializace
-loadData();
+document.getElementById('typeFilter').addEventListener('change', () => {
+  renderProducts();
+  updateStats();
+});
+
+// SPUŠTĚNÍ APLIKACE
+initApp();
 </script>
 
 </body>
