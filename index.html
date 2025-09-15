@@ -52,54 +52,77 @@
     </main>
   </div>
 
-  <!-- Embedded demo fallback -->
+  <!-- DEMO fallback (použije se jen když nenajdeme žádný JSON soubor) -->
   <script id="DATA" type="application/json">
-  { "categories": [ { "key":"Úvod","title":"Úvod","items":[
-      { "number":"Ú-01","title":"Co je Digitální Tržiště","subtitle":"Krátké vysvětlení pro nově příchozí","icon":"book-open.svg","layout":{"w":4} },
-      { "number":"Ú-02","title":"Jak přidávat položky","subtitle":"Přidáš řádek do JSONu, nic víc","icon":"plus.svg","layout":{"w":4} },
-      { "number":"Ú-03","title":"Kontakt přes bota","subtitle":"Otevře se formulář","icon":"chat.svg","layout":{"w":4} }
-  ] } ] }
+  {
+    "categories": [{
+      "key":"Úvod","title":"Úvod","items":[
+        { "number":"Ú-01","title":"Co je Digitální Tržiště","subtitle":"Krátké vysvětlení pro nově příchozí","icon":"book-open.svg","layout":{"w":4} },
+        { "number":"Ú-02","title":"Jak přidávat položky","subtitle":"Přidáš řádek do JSONu, nic víc","icon":"plus.svg","layout":{"w":4} },
+        { "number":"Ú-03","title":"Kontakt přes bota","subtitle":"Otevře se formulář","icon":"chat.svg","layout":{"w":4} }
+      ]
+    }]
+  }
   </script>
 
   <script>
-    // načti market.json -> final_catalog.json -> fallback
+    // --- Načtení dat: market.json -> final_catalog.json -> fallback ---
     async function loadData(){
       const urls = ['market.json','final_catalog.json'].map(u => u + '?v=' + Date.now());
       for (const u of urls){
-        try{ const r = await fetch(u); if (r.ok) return await r.json(); }catch(_){}
+        try{
+          const r = await fetch(u, {cache:'no-store'});
+          if (r.ok) return await r.json();
+        }catch(e){}
       }
-      try{ return JSON.parse(document.getElementById('DATA').textContent); }catch(_){ return {categories:[]} }
+      try { return JSON.parse(document.getElementById('DATA').textContent); }
+      catch { return { categories: [] }; }
     }
 
-    function iconEl(){const d=document.createElement('div');d.className='icon';d.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>';return d;}
+    // --- Ikonky (jednoduché vektorové fallbacky) ---
+    const ICONS = {
+      'book-open.svg':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h9a4 4 0 0 1 4 4v12H6a4 4 0 0 0-4-4V4z"/><path d="M22 4h-9a4 4 0 0 0-4 4v12h9a4 4 0 0 1 4-4V4z"/></svg>',
+      'plus.svg':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+      'chat.svg':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>',
+      'default.svg':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>'
+    };
+    function iconEl(name){ const d=document.createElement('div'); d.className='icon'; d.innerHTML = ICONS[name] || ICONS['default.svg']; return d; }
+
+    // --- Karta ---
     function cardEl(item){
       const span=item?.layout?.w ? Math.max(1,Math.min(12,item.layout.w)) : 3;
       const el=document.createElement('div'); el.className=`card col-${span}`;
       if(item.url){ el.onclick=()=>window.open(item.url,'_blank','noopener'); }
-      const r=document.createElement('div');
-      r.innerHTML=`<div class="num">${item.number||''}</div><div class="title">${item.title||''}</div><div class="sub">${item.subtitle||''}</div>`;
-      el.appendChild(iconEl()); el.appendChild(r); return el;
+      const right=document.createElement('div');
+      right.innerHTML = `
+        <div class="num">${item.number||''}</div>
+        <div class="title">${item.title||''}</div>
+        <div class="sub">${item.subtitle||''}</div>`;
+      el.appendChild(iconEl(item.icon)); el.appendChild(right);
+      return el;
     }
+
+    // --- UI stav ---
     let Z=1.0;
-    function setZoom(v){ Z=Math.max(0.6,Math.min(2.0,v)); document.getElementById('main').style.transform=`scale(${Z})`; document.getElementById('zreset').textContent=Math.round(Z*100)+'%'; }
+    const sidebar=document.getElementById('sidebar');
+    const grid=document.getElementById('grid');
+    const info=document.getElementById('info');
+    const main=document.getElementById('main');
+    const q=document.getElementById('q');
+
+    function setZoom(v){ Z=Math.max(0.6,Math.min(2.0,v)); main.style.transform=`scale(${Z})`; document.getElementById('zreset').textContent=Math.round(Z*100)+'%'; }
     document.getElementById('zplus').onclick=()=>setZoom(Z+0.1);
     document.getElementById('zminus').onclick=()=>setZoom(Z-0.1);
     document.getElementById('zreset').onclick=()=>setZoom(1.0);
 
-    const sidebar=document.getElementById('sidebar');
-    const grid=document.getElementById('grid');
-    const info=document.getElementById('info');
-    const q=document.getElementById('q');
-
+    // --- Sidebar a render ---
     function renderSidebar(cats){
       sidebar.innerHTML='';
       cats.forEach((c,i)=>{
-        const a=document.createElement('a'); a.href='#'; a.className='cat'+(i===0?' active':''); const count=(c.items||[]).length;
-        a.innerHTML=`${c.title||c.key}<span class="small">${count} položek</span>`;
-        a.onclick=(e)=>{e.preventDefault();
-          sidebar.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));
-          a.classList.add('active'); renderCategory(c);
-        };
+        const a=document.createElement('a'); a.href='#'; a.className='cat'+(i===0?' active':'');
+        const n=(c.items||[]).length;
+        a.innerHTML=`${c.title||c.key}<span class="small">${n} položek</span>`;
+        a.onclick=(e)=>{ e.preventDefault(); sidebar.querySelectorAll('.cat').forEach(x=>x.classList.remove('active')); a.classList.add('active'); renderCategory(c); };
         sidebar.appendChild(a);
       });
     }
@@ -115,18 +138,54 @@
       }
       items.forEach(it=>grid.appendChild(cardEl(it)));
       info.textContent=`Zobrazeno: ${items.length} / ${(cat.items||[]).length}  |  Kategorie: ${cat.title||cat.key}`;
-      document.getElementById('main').scrollTo({top:0,behavior:'instant'});
+      main.scrollTo({top:0,behavior:'instant'});
     }
     q.addEventListener('input',()=>{
       const i=[...sidebar.querySelectorAll('.cat')].findIndex(x=>x.classList.contains('active'));
       if(window.__CATS && window.__CATS[i]) renderCategory(window.__CATS[i]);
     });
 
+    // --- Konverze {items:[...]} -> categories podle "section" ---
+    function itemsToCategories(items){
+      const map = new Map();
+      for (const it of items){
+        const key = (it.section || 'Bez sekce').trim();
+        if(!map.has(key)) map.set(key, { key, title:key, items: [] });
+        map.get(key).items.push({
+          id: it.id || it.title,
+          order: map.get(key).items.length + 1,
+          number: it.number || '',
+          title: it.title || '',
+          subtitle: it.what || it.short || '',
+          icon: 'default.svg',
+          url: it.url || '#',
+          open: 'iframe',
+          layout: { w: 4 },
+          tags: (it.tags ? String(it.tags).split(',').map(s=>s.trim()).filter(Boolean) : [])
+        });
+      }
+      return Array.from(map.values()).sort((a,b)=>a.title.localeCompare(b.title,'cs'));
+    }
+
+    // --- Start ---
     (async function init(){
       let data = await loadData();
-      // pokud je data pole → zabal do 1 kategorie
-      if(Array.isArray(data)){ data={categories:[{key:"Vše",title:"Vše",items:data}]}; }
-      const cats = data?.categories || [];
+
+      let cats = [];
+      if (Array.isArray(data)) {
+        // data je rovnou pole položek
+        cats = [{ key:'Vše', title:'Vše', items:data }];
+      } else if (Array.isArray(data?.categories)) {
+        // data už má categories
+        cats = data.categories;
+      } else if (Array.isArray(data?.items)) {
+        // tvoje varianta: { items:[...140...] }
+        cats = itemsToCategories(data.items);
+      } else {
+        // fallback demo
+        cats = JSON.parse(document.getElementById('DATA').textContent).categories || [];
+      }
+
       window.__CATS = cats;
       renderSidebar(cats);
       if(cats[0]) renderCategory(cats[0]);
@@ -135,4 +194,6 @@
   </script>
 </body>
 </html>
+
+
 
