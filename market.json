@@ -1,0 +1,152 @@
+{
+  "app": {
+    "title": "Digitální Tržiště",
+    "public": true
+  },
+  "theme": {
+    "bg": "#0f0f0f",
+    "text": "#eeeeee",
+    "muted": "#bdbdbd",
+    "card": "#1b1b1b",
+    "card_hover": "#262626",
+    "line": "#2a2a2a",
+    "accent": "#ffcc00",
+    "sidebar": "#141414"
+  },
+  "ui": {
+    "layout": {
+      "grid_columns": 12,
+      "fixed": true
+    },
+    "zoom": {
+      "min": 0.6,
+      "max": 2.0,
+      "step": 0.1,
+      "default": 1.0
+    },
+    "icons": {
+      "base": "icons/",
+      "fallback": "default.svg"
+    },
+    "open_behavior": "iframe"
+  },
+
+  "categories": [
+    {
+      "key": "Úvod",
+      "title": "Úvod",
+      "description": "Rychlý přehled, co to je a jak to používat.",
+      "items": [
+        {
+          "id": "uvod-001",
+          "order": 1,
+          "number": "Ú-01",
+          "title": "Co je Digitální Tržiště",
+          "subtitle": "Krátké vysvětlení pro nově příchozí",
+          "icon": "book-open.svg",
+          "url": "",
+          "open": "blank",
+          "layout": { "w": 4 },
+          "tags": ["intro","návod"],
+          "related": []
+        },
+        {
+          "id": "uvod-002",
+          "order": 2,
+          "number": "Ú-02",
+          "title": "Jak přidávat položky",
+          "subtitle": "Přidáš řádek do JSONu, nic víc",
+          "icon": "plus.svg",
+          "url": "",
+          "open": "blank",
+          "layout": { "w": 4 },
+          "tags": ["workflow"],
+          "related": []
+        },
+        {
+          "id": "uvod-003",
+          "order": 3,
+          "number": "Ú-03",
+          "title": "Kontakt přes bota",
+          "subtitle": "Napiš jméno a e-mail, otevře se chat",
+          "icon": "chat.svg",
+          "url": "#bot",
+          "open": "inline",
+          "layout": { "w": 4 },
+          "tags": ["chat","bot"],
+          "related": []
+        }
+      ]
+    },
+    {
+      "key": "Aplikace",
+      "title": "Aplikace",
+      "description": "Katalog nástrojů a aplikací.",
+      "items": [
+        {
+          "id": "app-001",
+          "order": 1,
+          "number": "A-01",
+          "title": "Reality Scan – Vyhledávač",
+          "subtitle": "AI analýza inzerátů, scoring, export",
+          "icon": "scan.svg",
+          "url": "https://example.com/reality-scan",
+          "open": "iframe",
+          "layout": { "w": 4 },
+          "tags": ["AI","realitní"],
+          "related": [
+            { "label": "Filtry", "icon": "filter.svg", "action": "#filters" },
+            { "label": "Export", "icon": "export.svg", "action": "#export" }
+          ]
+        },
+        {
+          "id": "app-002",
+          "order": 2,
+          "number": "A-02",
+          "title": "StarterPack Family – Konfigurátor",
+          "subtitle": "Volba modelu, výbavy, export nabídky",
+          "icon": "house.svg",
+          "url": "https://example.com/spf-config",
+          "open": "iframe",
+          "layout": { "w": 4 },
+          "tags": ["domy","konfigurátor"],
+          "related": [
+            { "label": "Modely", "icon": "home.svg", "action": "#models" },
+            { "label": "Cenovka", "icon": "price-tag.svg", "action": "#pricing" }
+          ]
+        },
+        {
+          "id": "app-003",
+          "order": 3,
+          "number": "A-03",
+          "title": "CzechAI – Automatizace pro firmy",
+          "subtitle": "Chatboty, integrace, AI skripty",
+          "icon": "czechai.svg",
+          "url": "https://example.com/czechai",
+          "open": "iframe",
+          "layout": { "w": 4 },
+          "tags": ["AI","automatizace"],
+          "related": [
+            { "label": "Chatboty", "icon": "chat.svg", "action": "#chatbots" },
+            { "label": "Integrace", "icon": "plug.svg", "action": "#integrations" }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "icons_gallery": [
+    { "name": "book-open", "file": "book-open.svg", "tags": ["úvod","návod"] },
+    { "name": "plus", "file": "plus.svg", "tags": ["přidat","nové"] },
+    { "name": "chat", "file": "chat.svg", "tags": ["chat","komunikace"] },
+    { "name": "scan", "file": "scan.svg", "tags": ["AI","analýza"] },
+    { "name": "house", "file": "house.svg", "tags": ["dům","konfigurátor"] },
+    { "name": "czechai", "file": "czechai.svg", "tags": ["AI","firma"] },
+    { "name": "filter", "file": "filter.svg", "tags": ["filtr"] },
+    { "name": "export", "file": "export.svg", "tags": ["export"] },
+    { "name": "home", "file": "home.svg", "tags": ["model"] },
+    { "name": "price-tag", "file": "price-tag.svg", "tags": ["cena"] },
+    { "name": "plug", "file": "plug.svg", "tags": ["integrace"] },
+    { "name": "default", "file": "default.svg", "tags": [] }
+  ]
+}
