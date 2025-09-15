@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Digitální Tržiště – SAFE MODE</title>
-  <!-- GitHub Pages: cesty relativně k repu -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Digitální Tržiště – SAFE</title>
   <base href="/monster-bigboard-data/">
   <style>
     body{margin:0;background:#0f0f0f;color:#eee;font-family:Arial,Helvetica,sans-serif}
@@ -21,66 +20,43 @@
   <div id="grid" class="grid"></div>
 
   <script>
-    const bust = '?v=' + Date.now();
-    const CATALOG_URL = 'catalog.json' + bust;
+    const bust='?v='+Date.now();
+    const URL='catalog.json'+bust;
 
-    async function run(){
+    (async()=>{
       try{
-        const res = await fetch(CATALOG_URL);
-        if(!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.url);
-        const catalog = await res.json();
+        const r=await fetch(URL);
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const data=await r.json();
+        const grid=document.getElementById('grid');
 
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
+        // podpora dvou tvarů JSONu
+        const items = Array.isArray(data.categories)
+          ? data.categories.flatMap(c => c.items||[])
+          : (data.items||[]);
 
-        // pokud je správné schema (categories -> items)
-        if(Array.isArray(catalog.categories)){
-          catalog.categories.forEach(cat=>{
-            (cat.items||[]).forEach(item=>{
-              const d = document.createElement('div');
-              d.className = 'card';
-              d.onclick = ()=> item.url && window.open(item.url,'_blank');
-              d.innerHTML = `
-                <div class="num">${item.number||''}</div>
-                <div class="title">${item.title||''}</div>
-                <div class="sub">${item.subtitle||''}</div>
-              `;
-              grid.appendChild(d);
-            });
-          });
-        } else if (Array.isArray(catalog.items)) {
-          // fallback kdyby JSON byl plochý
-          catalog.items.forEach(item=>{
-            const d = document.createElement('div');
-            d.className = 'card';
-            d.onclick = ()=> item.url && window.open(item.url,'_blank');
-            d.innerHTML = `
-              <div class="num">${item.number||''}</div>
-              <div class="title">${item.title||''}</div>
-              <div class="sub">${item.subtitle||''}</div>
-            `;
-            grid.appendChild(d);
-          });
-        } else {
-          throw new Error('Neznámé schema catalog.json');
+        if(!items.length){
+          grid.innerHTML='<div class="card">V JSONu nejsou žádné položky.</div>';
+          return;
         }
 
-        if(!grid.children.length){
-          document.body.insertAdjacentHTML('afterbegin',
-            '<div style="padding:12px;background:#ffe0e0;color:#900;">Načteno, ale nenašel jsem žádné položky (prázdné items).</div>');
-        }
-      } catch(e){
-        console.error(e);
+        items.forEach(it=>{
+          const d=document.createElement('div');
+          d.className='card';
+          if(it.url) d.onclick=()=>window.open(it.url,'_blank');
+          d.innerHTML = `
+            <div class="num">${it.number||''}</div>
+            <div class="title">${it.title||''}</div>
+            <div class="sub">${it.subtitle||''}</div>
+          `;
+          grid.appendChild(d);
+        });
+      }catch(e){
         document.body.insertAdjacentHTML('afterbegin',
-          '<div style="padding:12px;background:#ffe0e0;color:#900;">Chyba načítání catalog.json – otevři devtools/Network a mrkni na status.</div>');
+          '<div style="padding:12px;background:#ffe0e0;color:#900;">Chyba načítání catalog.json</div>');
+        console.error(e);
       }
-    }
-    run();
+    })();
   </script>
 </body>
 </html>
-
-
-
-
-
