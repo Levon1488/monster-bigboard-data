@@ -6,16 +6,12 @@
   <title>Digitální Tržiště</title>
   <base href="/monster-bigboard-data/">
   <style>
-    :root{
-      --bg:#0f0f0f; --text:#eee; --muted:#bdbdbd;
-      --card:#1b1b1b; --card2:#262626; --line:#2a2a2a;
-      --accent:#ffcc00; --sidebar:#141414; --sideW:300px;
-    }
+    :root{--bg:#0f0f0f;--text:#eee;--muted:#bdbdbd;--card:#1b1b1b;--card2:#262626;--line:#2a2a2a;--accent:#ffcc00;--sidebar:#141414;--sideW:300px}
     *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
     .wrap{display:grid;grid-template-columns:var(--sideW) 1fr;grid-template-rows:64px 1fr;grid-template-areas:"head head" "side main";height:100%}
     header{grid-area:head;display:flex;align-items:center;justify-content:center;background:#101010;border-bottom:1px solid #1f1f1f;position:sticky;top:0;z-index:5}
-    h1{margin:0;color:var(--accent);letter-spacing:.2px}
+    h1{margin:0;color:var(--accent)}
     .topright{position:absolute;right:12px;top:10px;display:flex;gap:8px;align-items:center}
     .btn{background:var(--card);border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:8px;cursor:pointer}
     .btn:hover{background:var(--card2)}
@@ -28,17 +24,19 @@
     .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;min-width:980px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:flex-start;transition:.15s;cursor:pointer}
     .card:hover{background:var(--card2);transform:translateY(-1px)}
-    .icon{width:36px;height:36px;flex:0 0 36px;border-radius:8px;background:#101010;display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .icon img{width:100%;height:100%;object-fit:contain}
     .num{color:var(--accent);font-weight:700;margin-bottom:6px}
     .title{font-weight:700}
     .sub{color:var(--muted);margin-top:6px;font-size:.95em}
+    .icon{width:36px;height:36px;flex:0 0 36px;border-radius:8px;background:#101010;display:flex;align-items:center;justify-content:center}
     .hidden{display:none}
-    .col-1{grid-column:span 1}.col-2{grid-column:span 2}.col-3{grid-column:span 3}
-    .col-4{grid-column:span 4}.col-5{grid-column:span 5}.col-6{grid-column:span 6}
-    .col-7{grid-column:span 7}.col-8{grid-column:span 8}.col-9{grid-column:span 9}
-    .col-10{grid-column:span 10}.col-11{grid-column:span 11}.col-12{grid-column:span 12}
-    .infobar{position:sticky;bottom:0;left:0;right:0;background:rgba(20,20,20,.9);border-top:1px solid #1f1f1f;padding:8px 12px;font-size:.9em;color:#ccc}
+    .col-1{grid-column:span 1}.col-2{grid-column:span 2}.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-5{grid-column:span 5}.col-6{grid-column:span 6}.col-7{grid-column:span 7}.col-8{grid-column:span 8}.col-9{grid-column:span 9}.col-10{grid-column:span 10}.col-11{grid-column:span 11}.col-12{grid-column:span 12}
+    .infobar{position:sticky;bottom:0;background:rgba(20,20,20,.9);border-top:1px solid #1f1f1f;padding:8px 12px;font-size:.9em;color:#ccc}
+    /* modal bot */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+    .modal.open{display:flex}
+    .panel{background:#121212;border:1px solid #2a2a2a;border-radius:14px;padding:16px;min-width:320px;max-width:90%}
+    .row{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+    .row input, .row textarea{background:#0f0f0f;border:1px solid #333;color:#eee;border-radius:8px;padding:8px 10px}
   </style>
 </head>
 <body>
@@ -61,43 +59,75 @@
     </main>
   </div>
 
-  <script>
-    const bust='?v='+Date.now();
-    const SOURCES=['market.json' + bust];
+  <!-- BOT modal -->
+  <div id="botModal" class="modal">
+    <div class="panel">
+      <h3 style="margin-top:0;color:#ffcc00">Kontakt</h3>
+      <div class="row"><label>Jméno</label><input id="botName" placeholder="Křestní jméno"></div>
+      <div class="row"><label>E-mail</label><input id="botEmail" placeholder="email@domena.cz"></div>
+      <div class="row"><label>Zpráva</label><textarea id="botMsg" rows="4" placeholder="S čím potřebuješ pomoct?"></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button id="botCancel" class="btn">Zavřít</button>
+        <button id="botSend" class="btn">Odeslat</button>
+      </div>
+      <div id="botNote" style="margin-top:8px;color:#bdbdbd;font-size:.9em"></div>
+    </div>
+  </div>
 
-    let Z=1.0;
+  <script>
+    // ====== DATA LOADING (market.json -> catalog.json -> final_catalog.json -> data.json -> fallback demo) ======
+    const bust='?v='+Date.now();
+    const SOURCES=['market.json','catalog.json','final_catalog.json','data.json'].map(s=>s+bust);
+
+    let Z=1.0, ICON_BASE='';             // když market.json obsahuje ui.icons.base, nastavíme
+    let OPEN_BEHAVIOR='blank';           // 'blank'|'self'|'iframe'
+    let BOT_ENDPOINT=null;               // pokud v JSONu nastavíš bot_endpoint, budeme POSTovat
+
     const sidebar=document.getElementById('sidebar');
     const grid=document.getElementById('grid');
     const info=document.getElementById('info');
     const main=document.getElementById('main');
     const q=document.getElementById('q');
 
-    function setZoom(v){
-      Z=Math.max(0.6,Math.min(2.0,v));
-      main.style.transform=`scale(${Z})`;
-      document.getElementById('zreset').textContent=Math.round(Z*100)+'%';
-    }
+    // --- zoom ---
+    function setZoom(v){ Z=Math.max(0.6,Math.min(2.0,v)); main.style.transform=`scale(${Z})`; document.getElementById('zreset').textContent=Math.round(Z*100)+'%'; }
     document.getElementById('zplus').onclick  = ()=> setZoom(Z+0.1);
     document.getElementById('zminus').onclick = ()=> setZoom(Z-0.1);
     document.getElementById('zreset').onclick = ()=> setZoom(1.0);
 
-    function iconEl(src){
-      const w=document.createElement('div'); w.className='icon';
-      const img=document.createElement('img'); img.src=src||'default.svg';
-      img.onerror=()=>w.classList.add('hidden');
-      w.appendChild(img); return w;
+    // --- inline ikony (žádné 404) ---
+    const ICONS = {
+      'book-open.svg': '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h9a4 4 0 0 1 4 4v12H6a4 4 0 0 0-4-4V4z"/><path d="M22 4h-9a4 4 0 0 0-4 4v12h9a4 4 0 0 1 4-4V4z"/></svg>',
+      'plus.svg':      '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+      'chat.svg':      '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 0 1-4 4H8l-5 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>',
+      'scan.svg':      '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8h8v8H8z"/></svg>',
+      'house.svg':     '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11L12 3l9 8"/><path d="M5 10v10h14V10"/></svg>',
+      'czechai.svg':   '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>',
+      'default.svg':   '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>'
+    };
+    function iconEl(name){
+      const d=document.createElement('div'); d.className='icon';
+      const svg = (name && ICONS[name]) ? ICONS[name] : ICONS['default.svg'];
+      d.innerHTML = svg; return d;
     }
+
     function cardEl(item){
       const span=item?.layout?.w ? Math.max(1,Math.min(12,item.layout.w)) : 3;
       const el=document.createElement('div'); el.className=`card col-${span}`;
-      if(item.url) el.onclick=()=>window.open(item.url,'_blank','noopener');
+      const open=(item.open||OPEN_BEHAVIOR||'blank').toLowerCase();
+      if(item.url){
+        el.onclick=()=>{
+          if(item.url==='#bot'){ openBot(); return; }
+          if(open==='self') window.location.href=item.url;
+          else window.open(item.url,'_blank','noopener');
+        };
+      }
       const r=document.createElement('div');
-      r.innerHTML=`<div class="num">${item.number||''}</div>
-                   <div class="title">${item.title||''}</div>
-                   <div class="sub">${item.subtitle||''}</div>`;
+      r.innerHTML=`<div class="num">${item.number||''}</div><div class="title">${item.title||''}</div><div class="sub">${item.subtitle||''}</div>`;
       el.appendChild(iconEl(item.icon)); el.appendChild(r);
       return el;
     }
+
     function renderSidebar(cats){
       sidebar.innerHTML='';
       cats.forEach((c,i)=>{
@@ -126,38 +156,74 @@
       main.scrollTo({top:0,behavior:'instant'});
     }
     q.addEventListener('input',()=>{
-      const active=[...sidebar.querySelectorAll('.cat')].findIndex(x=>x.classList.contains('active'));
-      if(window.__CATS && window.__CATS[active]) renderCategory(window.__CATS[active]);
+      const i=[...sidebar.querySelectorAll('.cat')].findIndex(x=>x.classList.contains('active'));
+      if(window.__CATS && window.__CATS[i]) renderCategory(window.__CATS[i]);
     });
 
     async function loadFirstOk(urls){
       for(const u of urls){ try{ const r=await fetch(u); if(r.ok) return r.json(); }catch(_){ } }
-      throw new Error('Nelze načíst katalog: '+urls.join(', '));
+      return null;
     }
-    function unifyCatalog(data){
+    function unify(data){
+      if(!data) return null;
+      try{
+        const base=data?.ui?.icons?.base; if(base) ICON_BASE = base;
+        const ob=data?.ui?.open_behavior; if(ob) OPEN_BEHAVIOR = ob;
+        if(data?.bot_endpoint) BOT_ENDPOINT = data.bot_endpoint;
+        if(data?.app?.title) document.title=data.app.title;
+      }catch(_){}
       if(Array.isArray(data?.categories)) return data;
       if(Array.isArray(data?.items)) return {categories:[{key:'Vše',title:'Vše',items:data.items}]};
       if(Array.isArray(data)) return {categories:[{key:'Vše',title:'Vše',items:data}]};
-      return {categories:[]};
+      return null;
     }
+    const DEMO = {
+      categories:[{key:'Úvod',title:'Úvod',items:[
+        {number:'Ú-01',title:'Co je Digitální Tržiště',subtitle:'Krátké vysvětlení pro nově příchozí',icon:'book-open.svg',layout:{w:4}},
+        {number:'Ú-02',title:'Jak přidávat položky',subtitle:'Přidáš řádek do JSONu, nic víc',icon:'plus.svg',layout:{w:4}},
+        {number:'Ú-03',title:'Kontakt přes bota',subtitle:'Otevře se formulář',icon:'chat.svg',url:'#bot',open:'inline',layout:{w:4}}
+      ]}]
+    };
 
     (async function init(){
-      try{
-        const raw=await loadFirstOk(SOURCES);
-        const catalog=unifyCatalog(raw);
-        window.__CATS=catalog.categories||[];
-        renderSidebar(window.__CATS);
-        if(window.__CATS[0]) renderCategory(window.__CATS[0]);
-        setZoom(1.0);
-      }catch(e){
-        console.error(e);
-        document.body.insertAdjacentHTML('afterbegin',
-          '<div style="padding:12px;background:#ffe0e0;color:#900;">Chyba: nenačetl se katalog (catalog.json / final_catalog.json / data.json).</div>');
-      }
+      let data = await loadFirstOk(SOURCES);
+      let unified = unify(data) || DEMO;
+      window.__CATS = unified.categories||[];
+      renderSidebar(window.__CATS);
+      if(window.__CATS[0]) renderCategory(window.__CATS[0]);
+      setZoom(1.0);
     })();
+
+    // ====== BOT: mailto fallback + budoucí POST na server ======
+    const botModal=document.getElementById('botModal');
+    const botName=document.getElementById('botName');
+    const botEmail=document.getElementById('botEmail');
+    const botMsg=document.getElementById('botMsg');
+    const botNote=document.getElementById('botNote');
+    document.getElementById('botCancel').onclick=()=>botModal.classList.remove('open');
+    document.getElementById('botSend').onclick=async ()=>{
+      const name=(botName.value||'').trim(), email=(botEmail.value||'').trim(), msg=(botMsg.value||'').trim();
+      if(!email){ botNote.textContent='Zadej e-mail.'; return; }
+      // pokud existuje server endpoint → pošli POST
+      if(BOT_ENDPOINT){
+        try{
+          const r=await fetch(BOT_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name:name,email,message:msg,consent:true})});
+          if(r.ok){ botNote.textContent='Díky! Ozveme se.'; return; }
+          botNote.textContent='Nepodařilo se odeslat. Zkus později.';
+        }catch(_){ botNote.textContent='Chyba připojení.'; }
+      }else{
+        // fallback: mailto (funguje i na GitHub Pages)
+        const subject=encodeURIComponent('Kontakt z Digitálního Tržiště');
+        const body=encodeURIComponent(`Jméno: ${name}\nE-mail: ${email}\n\nZpráva:\n${msg}`);
+        window.location.href=`mailto:${email}?subject=${subject}&body=${body}`;
+        botModal.classList.remove('open');
+      }
+    };
+    function openBot(){ botModal.classList.add('open'); botNote.textContent=''; }
   </script>
 </body>
 </html>
+
 
 
 
