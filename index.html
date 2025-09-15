@@ -5,211 +5,243 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VIP Dashboard - Monster BigBoard</title>
 <style>
-  :root{--bg:#0f0f0f;--text:#eee;--muted:#bdbdbd;--card:#1b1b1b;--card2:#262626;--line:#2a2a2a;--accent:#ffcc00;--sidebar:#141414;--sideW:300px}
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-
-  /* Layout zůstává stejný jako originál */
-  .wrap{display:grid;grid-template-columns:var(--sideW) 1fr;grid-template-rows:64px 1fr;grid-template-areas:"head head" "side main";height:100%}
-  header{grid-area:head;display:flex;align-items:center;justify-content:center;background:#101010;border-bottom:1px solid #1f1f1f;position:sticky;top:0;z-index:5}
-  h1{margin:0;color:var(--accent)}
-
-  /* Admin panel */
-  .admin-bar{position:fixed;bottom:20px;right:20px;background:#1a1a1a;border:2px solid var(--accent);border-radius:12px;padding:10px;display:none;z-index:1000}
-  .admin-bar.show{display:flex;gap:10px}
-  .admin-btn{background:var(--accent);color:#000;border:none;padding:8px 15px;border-radius:6px;cursor:pointer;font-weight:bold}
+  :root{--bg:#0f0f0f;--text:#eee;--muted:#bdbdbd;--card:#1b1b1b;--card2:#262626;--line:#2a2a2a;--accent:#ffcc00;--sidebar:#141414}
+  *{box-sizing:border-box}html,body{height:100%;margin:0}
+  body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+  .container{display:grid;grid-template-columns:250px 1fr;grid-template-rows:60px 1fr;height:100vh}
+  header{grid-column:1/3;background:#101010;border-bottom:1px solid #333;display:flex;align-items:center;padding:0 20px;justify-content:space-between}
+  h1{color:var(--accent);margin:0;font-size:1.5em}
+  .sidebar{background:var(--sidebar);border-right:1px solid #333;padding:20px;overflow-y:auto}
+  .main{padding:20px;overflow-y:auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;cursor:pointer;transition:0.3s;position:relative}
+  .card:hover{background:var(--card2);transform:translateY(-2px)}
+  .badge{position:absolute;top:10px;right:10px;background:var(--accent);color:#000;padding:2px 8px;border-radius:4px;font-size:0.75em;font-weight:bold}
+  .icon{font-size:2em;margin-bottom:10px}
+  .title{font-weight:bold;margin-bottom:5px}
+  .subtitle{color:var(--muted);font-size:0.9em}
+  .price{color:var(--accent);margin-top:10px;font-weight:bold}
+  .category{padding:10px;margin:5px 0;background:#1a1a1a;border-radius:8px;cursor:pointer}
+  .category:hover{background:#222}
+  .category.active{border:2px solid var(--accent)}
+  .search{background:#111;border:1px solid #333;color:#fff;padding:8px;border-radius:6px;width:300px}
+  .btn{background:var(--card);border:1px solid var(--line);color:var(--text);padding:8px 15px;border-radius:6px;cursor:pointer;margin:0 5px}
+  .btn:hover{background:var(--card2)}
 
   /* Chat Bot */
-  .chat-bot{position:fixed;bottom:20px;left:20px;width:350px;height:500px;background:var(--card);border:1px solid var(--line);border-radius:12px;display:none;flex-direction:column;z-index:1000}
-  .chat-bot.open{display:flex}
-  .chat-header{background:var(--accent);color:#000;padding:15px;border-radius:12px 12px 0 0;font-weight:bold}
+  .chat-widget{position:fixed;bottom:20px;right:20px;width:350px;height:500px;background:var(--card);border:2px solid var(--accent);border-radius:12px;display:none;flex-direction:column;z-index:1000}
+  .chat-widget.open{display:flex}
+  .chat-header{background:var(--accent);color:#000;padding:15px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}
   .chat-messages{flex:1;overflow-y:auto;padding:15px}
-  .chat-input{display:flex;padding:10px;border-top:1px solid var(--line)}
-  .chat-input input{flex:1;background:#111;border:1px solid var(--line);color:#fff;padding:8px;border-radius:6px}
-  .chat-input button{background:var(--accent);color:#000;border:none;padding:8px 15px;margin-left:10px;border-radius:6px;cursor:pointer}
-
-  /* Floating Bot Button */
-  .bot-toggle{position:fixed;bottom:20px;left:20px;width:60px;height:60px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(255,204,0,0.3);z-index:999}
-  .bot-toggle:hover{transform:scale(1.1)}
-
-  /* Karty - stejný styl */
-  .topright{position:absolute;right:12px;top:10px;display:flex;gap:8px;align-items:center}
-  .btn{background:var(--card);border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:8px;cursor:pointer}
-  .btn:hover{background:var(--card2)}
-  .search{background:#111;border:1px solid var(--line);color:#ddd;border-radius:8px;padding:8px 10px;min-width:260px;outline:none}
-  aside{grid-area:side;background:var(--sidebar);border-right:1px solid #1f1f1f;padding:12px;overflow:auto}
-  .cat{display:block;padding:10px 12px;margin-bottom:8px;border-radius:10px;background:#171717;border:1px solid #242424;text-decoration:none;color:var(--text);cursor:pointer}
-  .cat.active{outline:2px solid var(--accent)}
-  .small{display:block;color:var(--muted);margin-top:2px;font-size:.9em}
-  main{grid-area:main;overflow:auto;padding:16px;transform-origin:0 0}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;transition:.15s;cursor:pointer;position:relative}
-  .card:hover{background:var(--card2);transform:translateY(-1px)}
-  .card-icon{width:40px;height:40px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:10px}
-  .card-title{font-weight:700;margin-bottom:5px}
-  .card-subtitle{color:var(--muted);font-size:0.9em}
-  .card-badge{position:absolute;top:10px;right:10px;background:var(--accent);color:#000;padding:2px 8px;border-radius:4px;font-size:0.75em;font-weight:bold}
-
-  /* Modal pro editaci */
-  .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:2000}
-  .modal.show{display:flex}
-  .modal-content{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:30px;min-width:500px}
-  .modal input, .modal textarea{width:100%;background:#111;border:1px solid var(--line);color:#fff;padding:10px;margin:10px 0;border-radius:6px}
+  .chat-input-area{display:flex;padding:10px;border-top:1px solid var(--line)}
+  .chat-input{flex:1;background:#111;border:1px solid #333;color:#fff;padding:8px;border-radius:6px}
+  .bot-toggle{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.5em;z-index:999}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>🚀 VIP Dashboard</h1>
-      <div class="topright">
-        <input id="search" class="search" placeholder="Hledat produkty...">
-        <button id="zminus" class="btn">−</button>
-        <button id="zplus" class="btn">+</button>
-        <button id="zreset" class="btn">100%</button>
-        <button id="adminToggle" class="btn" style="background:var(--accent);color:#000">⚙️ Admin</button>
-      </div>
-    </header>
 
-    <aside id="sidebar">
-      <!-- Kategorie se generují dynamicky -->
-    </aside>
+<div class="container">
+  <header>
+    <h1>🚀 Monster BigBoard - VIP Dashboard</h1>
+    <div>
+      <input type="text" class="search" id="searchInput" placeholder="Hledat produkty...">
+      <button class="btn" onclick="toggleZoom(-0.1)">➖</button>
+      <button class="btn" onclick="toggleZoom(0.1)">➕</button>
+      <button class="btn" id="zoomLevel">100%</button>
+    </div>
+  </header>
 
-    <main id="main">
-      <div id="grid" class="grid">
-        <!-- Karty se generují dynamicky -->
-      </div>
-    </main>
+  <div class="sidebar" id="sidebar">
+    <h3 style="color:var(--accent)">Kategorie</h3>
+    <div id="categories"></div>
   </div>
 
-  <!-- Chat Bot -->
-  <div class="bot-toggle" onclick="toggleBot()">💬</div>
-  <div class="chat-bot" id="chatBot">
-    <div class="chat-header">
-      🤖 VIP Asistent
-      <span style="float:right;cursor:pointer" onclick="toggleBot()">✕</span>
-    </div>
-    <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Napište zprávu..." onkeypress="if(event.key==='Enter')sendMessage()">
-      <button onclick="sendMessage()">Odeslat</button>
+  <div class="main" id="main">
+    <div class="grid" id="productGrid"></div>
+  </div>
+</div>
+
+<!-- Chat Bot -->
+<div class="bot-toggle" onclick="toggleChat()">💬</div>
+<div class="chat-widget" id="chatWidget">
+  <div class="chat-header">
+    <span>🤖 VIP Asistent</span>
+    <span style="cursor:pointer" onclick="toggleChat()">✖</span>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div style="background:#222;padding:10px;border-radius:8px;margin-bottom:10px">
+      Ahoj! Jsem VIP asistent. Jak vám mohu pomoci?
     </div>
   </div>
-
-  <!-- Admin Panel -->
-  <div class="admin-bar" id="adminBar">
-    <button class="admin-btn" onclick="addProduct()">➕ Přidat produkt</button>
-    <button class="admin-btn" onclick="exportData()">📥 Export</button>
-    <button class="admin-btn" onclick="importData()">📤 Import</button>
-    <button class="admin-btn" onclick="editMode()">✏️ Editovat</button>
+  <div class="chat-input-area">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Napište zprávu..." onkeypress="if(event.key==='Enter')sendMessage()">
+    <button class="btn" onclick="sendMessage()">Odeslat</button>
   </div>
-
-  <!-- Modal pro editaci -->
-  <div class="modal" id="editModal">
-    <div class="modal-content">
-      <h2>Editovat produkt</h2>
-      <input type="text" id="editTitle" placeholder="Název">
-      <textarea id="editDesc" placeholder="Popis" rows="4"></textarea>
-      <input type="text" id="editPrice" placeholder="Cena">
-      <div style="margin-top:20px">
-        <button class="admin-btn" onclick="saveProduct()">Uložit</button>
-        <button class="btn" onclick="closeModal()">Zrušit</button>
-      </div>
-    </div>
-  </div>
+</div>
 
 <script>
-// ========== DATA MANAGEMENT ==========
-let products = [
-  {
-    id: 1,
-    category: "Tipy na nemovitosti",
-    title: "Fresh Pack - Monitoring",
-    subtitle: "Denní sledování nových nabídek",
-    icon: "🏠",
-    type: "ONLINE",
-    price: "2900 Kč/měsíc"
-  },
-  {
-    id: 2,
-    category: "Databáze",
-    title: "Databáze investorů",
-    subtitle: "5000+ ověřených kontaktů",
-    icon: "📊",
-    type: "PREMIUM",
-    price: "9900 Kč"
-  },
-  {
-    id: 3,
-    category: "Nástroje",
-    title: "ROI Kalkulátor Pro",
-    subtitle: "Excel nástroj pro analýzu",
-    icon: "📈",
-    type: "CUSTOM",
-    price: "4900 Kč"
+// Data produktů - načte se z vašich JSON souborů
+let products = [];
+let categories = new Set();
+let currentCategory = 'all';
+let zoom = 1;
+
+// Načtení dat z JSON
+async function loadData() {
+  try {
+    // Zkusí načíst vaše data
+    const response = await fetch('final_catalog.json');
+    if (response.ok) {
+      const data = await response.json();
+      processData(data);
+    } else {
+      loadDemoData();
+    }
+  } catch (error) {
+    console.log('Načítám demo data...');
+    loadDemoData();
   }
-];
-
-let categories = [...new Set(products.map(p => p.category))];
-let currentCategory = null;
-let zoom = 1.0;
-let isAdmin = false;
-
-// ========== RENDER FUNCTIONS ==========
-function renderSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebar.innerHTML = categories.map((cat, i) => {
-    const count = products.filter(p => p.category === cat).length;
-    return `
-      <a class="cat ${i === 0 ? 'active' : ''}" onclick="selectCategory('${cat}', this)">
-        ${cat}
-        <span class="small">${count} produktů</span>
-      </a>
-    `;
-  }).join('');
-
-  if (categories[0]) selectCategory(categories[0]);
 }
 
-function selectCategory(cat, elem) {
-  currentCategory = cat;
-  if (elem) {
-    document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
-    elem.classList.add('active');
-  }
+// Demo data pro testování
+function loadDemoData() {
+  const demoData = [
+    {
+      section: "Tipy na nemovitosti",
+      type: "ONLINE",
+      title: "Fresh Pack - Monitoring", 
+      short: "Denní sledování nových nabídek",
+      price: "2900 Kč/měsíc",
+      icon: "🏠"
+    },
+    {
+      section: "Databáze",
+      type: "PREMIUM",
+      title: "Databáze investorů",
+      short: "5000+ ověřených kontaktů",
+      price: "9900 Kč",
+      icon: "📊"
+    },
+    {
+      section: "Nástroje",
+      type: "CUSTOM",
+      title: "ROI Kalkulátor Pro",
+      short: "Excel nástroj pro analýzu investic",
+      price: "4900 Kč",
+      icon: "📈"
+    },
+    {
+      section: "Tipy na nemovitosti",
+      type: "ONLINE",
+      title: "VIP Hunter",
+      short: "Exkluzivní off-market nabídky",
+      price: "5900 Kč/měsíc",
+      icon: "💎"
+    },
+    {
+      section: "Vzdělávání",
+      type: "PREMIUM",
+      title: "Masterclass Flipping",
+      short: "2denní intenzivní workshop",
+      price: "19900 Kč",
+      icon: "🎓"
+    },
+    {
+      section: "Nástroje",
+      type: "ONLINE",
+      title: "Sada smluv Pro",
+      short: "150+ právně ověřených šablon",
+      price: "3900 Kč",
+      icon: "📝"
+    }
+  ];
+  processData(demoData);
+}
+
+// Zpracování dat
+function processData(data) {
+  products = Array.isArray(data) ? data : [data];
+
+  // Získat kategorie
+  products.forEach(p => {
+    if (p.section) categories.add(p.section);
+  });
+
+  renderCategories();
   renderProducts();
 }
 
+// Vykreslení kategorií
+function renderCategories() {
+  const container = document.getElementById('categories');
+  container.innerHTML = '<div class="category active" onclick="filterCategory(\'all\', this)">🔹 Všechny produkty</div>';
+
+  categories.forEach(cat => {
+    const count = products.filter(p => p.section === cat).length;
+    container.innerHTML += `
+      <div class="category" onclick="filterCategory('${cat}', this)">
+        📁 ${cat} (${count})
+      </div>
+    `;
+  });
+}
+
+// Filtrování podle kategorie
+function filterCategory(category, element) {
+  currentCategory = category;
+  document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+  element.classList.add('active');
+  renderProducts();
+}
+
+// Vykreslení produktů
 function renderProducts() {
-  const grid = document.getElementById('grid');
-  const search = document.getElementById('search').value.toLowerCase();
+  const grid = document.getElementById('productGrid');
+  const search = document.getElementById('searchInput').value.toLowerCase();
 
-  let filtered = products.filter(p => p.category === currentCategory);
+  let filtered = products;
 
+  // Filtr podle kategorie
+  if (currentCategory !== 'all') {
+    filtered = filtered.filter(p => p.section === currentCategory);
+  }
+
+  // Filtr podle hledání
   if (search) {
     filtered = filtered.filter(p => 
-      p.title.toLowerCase().includes(search) ||
-      p.subtitle.toLowerCase().includes(search)
+      (p.title && p.title.toLowerCase().includes(search)) ||
+      (p.short && p.short.toLowerCase().includes(search))
     );
   }
 
+  // Vykreslit karty
   grid.innerHTML = filtered.map(product => `
-    <div class="card" onclick="productClick(${product.id})">
-      <div class="card-badge">${product.type}</div>
-      <div class="card-icon">${product.icon}</div>
-      <div class="card-title">${product.title}</div>
-      <div class="card-subtitle">${product.subtitle}</div>
-      <div style="margin-top:10px;color:var(--accent)">${product.price}</div>
+    <div class="card" onclick="selectProduct('${product.title}')">
+      <div class="badge">${product.type || 'ONLINE'}</div>
+      <div class="icon">${product.icon || '📦'}</div>
+      <div class="title">${product.title || 'Produkt'}</div>
+      <div class="subtitle">${product.short || product.subtitle || ''}</div>
+      <div class="price">${product.price || 'Cena na dotaz'}</div>
     </div>
   `).join('');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="color:#666">Žádné produkty nenalezeny</div>';
+  }
 }
 
-// ========== BOT FUNCTIONS ==========
-function toggleBot() {
-  const bot = document.getElementById('chatBot');
-  bot.classList.toggle('open');
-  if (bot.classList.contains('open')) {
-    addBotMessage("Ahoj! Jsem VIP asistent. Jak vám mohu pomoci s výběrem produktu?");
+// Výběr produktu
+function selectProduct(title) {
+  const product = products.find(p => p.title === title);
+  if (product) {
+    document.getElementById('chatWidget').classList.add('open');
+    addMessage(`Zajímá vás "${product.title}"? Cena: ${product.price || 'na dotaz'}. Chcete více informací?`, 'bot');
   }
+}
+
+// Chat funkce
+function toggleChat() {
+  document.getElementById('chatWidget').classList.toggle('open');
 }
 
 function sendMessage() {
@@ -217,108 +249,55 @@ function sendMessage() {
   const message = input.value.trim();
   if (!message) return;
 
-  addUserMessage(message);
+  addMessage(message, 'user');
   input.value = '';
 
   // Simulace odpovědi bota
   setTimeout(() => {
     if (message.toLowerCase().includes('cena')) {
-      addBotMessage("Naše ceny začínají od 2900 Kč/měsíc. Chcete vidět konkrétní balíček?");
+      addMessage('Ceny našich produktů začínají od 2900 Kč. Který produkt vás zajímá?', 'bot');
     } else if (message.toLowerCase().includes('koupit')) {
-      addBotMessage("Super! Mohu pro vás připravit objednávku. Který produkt vás zajímá?");
+      addMessage('Super! Připravím pro vás objednávku. Napište mi váš email a telefon.', 'bot');
     } else {
-      addBotMessage("Děkuji za zprávu. Náš tým vám odpoví do 24 hodin.");
+      addMessage('Děkuji za zprávu. Předám ji našemu týmu a ozveme se do 24 hodin.', 'bot');
     }
   }, 1000);
 }
 
-function addUserMessage(text) {
+function addMessage(text, sender) {
   const messages = document.getElementById('chatMessages');
-  messages.innerHTML += `<div style="text-align:right;margin:10px 0">
-    <span style="background:#333;padding:8px 12px;border-radius:8px;display:inline-block">${text}</span>
-  </div>`;
+  const messageDiv = document.createElement('div');
+  messageDiv.style.cssText = sender === 'user' 
+    ? 'text-align:right;margin:10px 0' 
+    : 'margin:10px 0';
+  messageDiv.innerHTML = `
+    <span style="background:${sender === 'user' ? '#333' : '#222'};padding:10px;border-radius:8px;display:inline-block">
+      ${text}
+    </span>
+  `;
+  messages.appendChild(messageDiv);
   messages.scrollTop = messages.scrollHeight;
 }
 
-function addBotMessage(text) {
-  const messages = document.getElementById('chatMessages');
-  messages.innerHTML += `<div style="margin:10px 0">
-    <span style="background:var(--accent);color:#000;padding:8px 12px;border-radius:8px;display:inline-block">${text}</span>
-  </div>`;
-  messages.scrollTop = messages.scrollHeight;
-}
-
-// ========== ADMIN FUNCTIONS ==========
-document.getElementById('adminToggle').onclick = function() {
-  isAdmin = !isAdmin;
-  document.getElementById('adminBar').classList.toggle('show');
-  this.style.background = isAdmin ? '#ff5252' : 'var(--accent)';
-};
-
-function addProduct() {
-  const title = prompt("Název produktu:");
-  if (!title) return;
-
-  products.push({
-    id: products.length + 1,
-    category: currentCategory || categories[0],
-    title: title,
-    subtitle: "Nový produkt",
-    icon: "📦",
-    type: "ONLINE",
-    price: "0 Kč"
-  });
-
-  renderProducts();
-}
-
-function productClick(id) {
-  if (isAdmin) {
-    const product = products.find(p => p.id === id);
-    document.getElementById('editTitle').value = product.title;
-    document.getElementById('editDesc').value = product.subtitle;
-    document.getElementById('editPrice').value = product.price;
-    document.getElementById('editModal').classList.add('show');
-  } else {
-    // Normální kliknutí - otevře detail
-    const product = products.find(p => p.id === id);
-    addBotMessage(`Zajímá vás "${product.title}"? Cena je ${product.price}. Chcete více informací?`);
-    document.getElementById('chatBot').classList.add('open');
-  }
-}
-
-function closeModal() {
-  document.getElementById('editModal').classList.remove('show');
-}
-
-function saveProduct() {
-  // Zde by se uložilo do databáze
-  alert("Produkt uložen!");
-  closeModal();
-}
-
-// ========== ZOOM FUNCTIONS ==========
-document.getElementById('zplus').onclick = () => setZoom(zoom + 0.1);
-document.getElementById('zminus').onclick = () => setZoom(zoom - 0.1);
-document.getElementById('zreset').onclick = () => setZoom(1.0);
-
-function setZoom(value) {
-  zoom = Math.max(0.5, Math.min(2.0, value));
+// Zoom funkce
+function toggleZoom(delta) {
+  zoom = Math.max(0.5, Math.min(2, zoom + delta));
   document.getElementById('main').style.transform = `scale(${zoom})`;
-  document.getElementById('zreset').textContent = Math.round(zoom * 100) + '%';
+  document.getElementById('main').style.transformOrigin = '0 0';
+  document.getElementById('zoomLevel').textContent = Math.round(zoom * 100) + '%';
 }
 
-// ========== INIT ==========
-document.getElementById('search').addEventListener('input', renderProducts);
-renderSidebar();
+// Event listeners
+document.getElementById('searchInput').addEventListener('input', renderProducts);
 
-// Simulace načtení dat z API
-setTimeout(() => {
-  console.log("Data načtena z API");
-}, 1000);
+// Inicializace
+loadData();
 </script>
+
 </body>
 </html>
+
+
 
 
 
