@@ -3,260 +3,84 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Digitální Tržiště</title>
-
-  <!-- GitHub Pages base -->
+  <title>Digitální Tržiště – SAFE MODE</title>
+  <!-- GitHub Pages: cesty relativně k repu -->
   <base href="/monster-bigboard-data/">
-
   <style>
-    :root {
-      --bg: #0f0f0f;
-      --card: #1b1b1b;
-      --cardHover: #262626;
-      --text: #eee;
-      --muted: #bdbdbd;
-      --accent: #ffcc00;
-      --sidebar: #141414;
-      --sidebarW: 280px;
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    /* Layout */
-    .wrap {
-      display: grid;
-      grid-template-columns: var(--sidebarW) 1fr;
-      grid-template-rows: 64px 1fr;
-      grid-template-areas:
-        "head head"
-        "side main";
-      height: 100%;
-    }
-    header {
-      grid-area: head;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      border-bottom: 1px solid #1f1f1f;
-      background: #111;
-      position: sticky; top: 0; z-index: 10;
-    }
-    header h1 {
-      margin: 0;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      color: var(--accent);
-    }
-    .zoom {
-      position: absolute; right: 16px; top: 12px; display: flex; gap: 8px;
-    }
-    .zoom button {
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid #2a2a2a;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .zoom button:hover { background: var(--cardHover); }
-
-    aside {
-      grid-area: side;
-      background: var(--sidebar);
-      border-right: 1px solid #1f1f1f;
-      padding: 14px;
-      overflow: auto;
-      position: sticky; top: 64px; height: calc(100vh - 64px);
-    }
-    .cat {
-      display: block;
-      padding: 10px 12px;
-      margin-bottom: 6px;
-      border-radius: 10px;
-      background: #171717;
-      color: var(--text);
-      text-decoration: none;
-      border: 1px solid #242424;
-      cursor: pointer;
-    }
-    .cat.active { outline: 2px solid var(--accent); }
-    .cat small { display:block; color: var(--muted); margin-top:2px; }
-
-    main {
-      grid-area: main;
-      padding: 18px;
-      overflow: auto;
-      transform-origin: 0 0;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(12, minmax(0,1fr));
-      gap: 14px;
-      min-width: 980px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid #2a2a2a;
-      border-radius: 14px;
-      padding: 14px;
-      transition: .2s;
-      display: flex; gap: 10px; align-items: flex-start;
-    }
-    .card:hover { background: var(--cardHover); transform: translateY(-1px); }
-    .num { font-weight: 700; color: var(--accent); margin-bottom: 6px; }
-    .title { font-weight: 700; }
-    .sub { color: var(--muted); margin-top: 6px; font-size: .95em; }
-
-    .icon {
-      width: 36px; height: 36px; flex: 0 0 36px;
-      border-radius: 8px; background: #101010; display:flex;align-items:center;justify-content:center;
-      overflow: hidden;
-    }
-    .icon img { width: 100%; height: 100%; object-fit: contain; }
-    .hidden { display:none; }
-
-    /* helpers to place cards to fixed grid if layout je v JSONu */
-    .col-1 { grid-column: span 1; } .col-2 { grid-column: span 2; }
-    .col-3 { grid-column: span 3; } .col-4 { grid-column: span 4; }
-    .col-5 { grid-column: span 5; } .col-6 { grid-column: span 6; }
-    .col-7 { grid-column: span 7; } .col-8 { grid-column: span 8; }
-    .col-9 { grid-column: span 9; } .col-10 { grid-column: span 10; }
-    .col-11 { grid-column: span 11; } .col-12 { grid-column: span 12; }
+    body{margin:0;background:#0f0f0f;color:#eee;font-family:Arial,Helvetica,sans-serif}
+    h1{margin:16px 0;text-align:center;color:#ffcc00}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:16px}
+    .card{background:#1b1b1b;border:1px solid #2a2a2a;border-radius:12px;padding:14px}
+    .num{color:#ffcc00;font-weight:700;margin-bottom:6px}
+    .title{font-weight:700}
+    .sub{color:#bdbdbd;margin-top:6px;font-size:.95em}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Digitální Tržiště</h1>
-      <div class="zoom">
-        <button id="zminus">−</button>
-        <button id="zplus">+</button>
-        <button id="zreset">100%</button>
-      </div>
-    </header>
-
-    <aside id="sidebar"></aside>
-
-    <main id="main">
-      <div id="grid" class="grid"></div>
-    </main>
-  </div>
+  <h1>Digitální Tržiště</h1>
+  <div id="grid" class="grid"></div>
 
   <script>
-    // no-cache verze
-    const bust = `?v=${Date.now()}`;
-    const CONFIG_URL  = `config.json${bust}`;
-    const CATALOG_URL = `catalog.json${bust}`;
+    const bust = '?v=' + Date.now();
+    const CATALOG_URL = 'catalog.json' + bust;
 
-    let Z = 1.0;
+    async function run(){
+      try{
+        const res = await fetch(CATALOG_URL);
+        if(!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.url);
+        const catalog = await res.json();
 
-    const qs = s => document.querySelector(s);
-    const grid = qs('#grid');
-    const sidebar = qs('#sidebar');
-    const main = qs('#main');
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
 
-    function setZoom(v) {
-      Z = Math.max(0.5, Math.min(2.0, v));
-      main.style.transform = `scale(${Z})`;
-      qs('#zreset').textContent = Math.round(Z*100)+'%';
-    }
+        // pokud je správné schema (categories -> items)
+        if(Array.isArray(catalog.categories)){
+          catalog.categories.forEach(cat=>{
+            (cat.items||[]).forEach(item=>{
+              const d = document.createElement('div');
+              d.className = 'card';
+              d.onclick = ()=> item.url && window.open(item.url,'_blank');
+              d.innerHTML = `
+                <div class="num">${item.number||''}</div>
+                <div class="title">${item.title||''}</div>
+                <div class="sub">${item.subtitle||''}</div>
+              `;
+              grid.appendChild(d);
+            });
+          });
+        } else if (Array.isArray(catalog.items)) {
+          // fallback kdyby JSON byl plochý
+          catalog.items.forEach(item=>{
+            const d = document.createElement('div');
+            d.className = 'card';
+            d.onclick = ()=> item.url && window.open(item.url,'_blank');
+            d.innerHTML = `
+              <div class="num">${item.number||''}</div>
+              <div class="title">${item.title||''}</div>
+              <div class="sub">${item.subtitle||''}</div>
+            `;
+            grid.appendChild(d);
+          });
+        } else {
+          throw new Error('Neznámé schema catalog.json');
+        }
 
-    qs('#zplus').onclick  = () => setZoom(Z + 0.1);
-    qs('#zminus').onclick = () => setZoom(Z - 0.1);
-    qs('#zreset').onclick = () => setZoom(1.0);
-
-    function iconEl(src) {
-      const wrap = document.createElement('div');
-      wrap.className = 'icon';
-      const img = document.createElement('img');
-      img.src = src || 'default.svg';
-      img.onerror = () => wrap.classList.add('hidden'); // když ikona není, prostě ji skryj
-      wrap.appendChild(img);
-      return wrap;
-    }
-
-    function cardEl(item) {
-      const card = document.createElement('div');
-      const colSpan = item?.layout?.w ? Math.min(12, Math.max(1, item.layout.w)) : 3;
-      card.className = `card col-${colSpan}`;
-      if (item.url) card.onclick = () => window.open(item.url, '_blank');
-
-      const left = iconEl(item.icon);
-      const right = document.createElement('div');
-      right.innerHTML = `
-        <div class="num">${item.number || ''}</div>
-        <div class="title">${item.title || ''}</div>
-        <div class="sub">${item.subtitle || ''}</div>
-      `;
-      card.appendChild(left);
-      card.appendChild(right);
-      return card;
-    }
-
-    function renderSidebar(categories) {
-      sidebar.innerHTML = '';
-      categories.forEach((c, i) => {
-        const a = document.createElement('a');
-        a.className = 'cat' + (i===0 ? ' active' : '');
-        a.textContent = c.title || c.key;
-        const count = (c.items || []).length;
-        const sm = document.createElement('small');
-        sm.textContent = count ? `${count} položek` : '';
-        a.appendChild(sm);
-        a.href = '#';
-        a.onclick = (e) => {
-          e.preventDefault();
-          Array.from(sidebar.querySelectorAll('.cat')).forEach(x => x.classList.remove('active'));
-          a.classList.add('active');
-          renderCategory(c);
-        };
-        sidebar.appendChild(a);
-      });
-    }
-
-    function renderCategory(cat) {
-      grid.innerHTML = '';
-      const items = (cat.items || []).slice().sort((a,b) => (a.order||0)-(b.order||0));
-      items.forEach(it => grid.appendChild(cardEl(it)));
-      // scroll top po přepnutí
-      main.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    (async function init(){
-      try {
-        const [config, catalog] = await Promise.all([
-          fetch(CONFIG_URL).then(r => r.json()),
-          fetch(CATALOG_URL).then(r => r.json())
-        ]);
-
-        // header title z configu (když je)
-        if (config?.app_title) document.title = config.app_title;
-
-        // sidebar + první kategorie
-        const cats = catalog.categories || [];
-        renderSidebar(cats);
-        if (cats[0]) renderCategory(cats[0]);
-
-        // default zoom z configu (když je)
-        if (config?.ui?.zoom?.default) setZoom(config.ui.zoom.default); else setZoom(1);
-
-      } catch (e) {
+        if(!grid.children.length){
+          document.body.insertAdjacentHTML('afterbegin',
+            '<div style="padding:12px;background:#ffe0e0;color:#900;">Načteno, ale nenašel jsem žádné položky (prázdné items).</div>');
+        }
+      } catch(e){
         console.error(e);
         document.body.insertAdjacentHTML('afterbegin',
-          '<div style="padding:12px;background:#ffe0e0;color:#900;">Nelze načíst data (config.json / catalog.json).</div>');
+          '<div style="padding:12px;background:#ffe0e0;color:#900;">Chyba načítání catalog.json – otevři devtools/Network a mrkni na status.</div>');
       }
-    })();
+    }
+    run();
   </script>
 </body>
 </html>
+
+
 
 
 
