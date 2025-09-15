@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Monster BigBoard</title>
+
+  <!-- důležité pro GitHub Pages -->
+  <base href="/monster-bigboard-data/">
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -43,36 +47,52 @@
       margin: 8px 0 0;
       color: #bbb;
     }
-    .section {
-      font-size: 0.8em;
-      color: #999;
-    }
   </style>
 </head>
 <body>
-  <h1>📊 Monster BigBoard</h1>
-  <div id="grid" class="grid"></div>
+  <h1>Digitální Tržiště</h1>
+  <div id="app"></div>
 
   <script>
-    async function loadData() {
-      const response = await fetch("final_catalog.json"); // nebo final_catalog.min.json
-      const data = await response.json();
+    const bust = `?v=${Date.now()}`;
+    const CONFIG_URL  = `config.json${bust}`;
+    const CATALOG_URL = `catalog.json${bust}`;
 
-      const grid = document.getElementById("grid");
-      data.items.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="section">${item.section}</div>
-          <h2>${item.title}</h2>
-          <p>${item.what}</p>
-          <p><strong>Proč:</strong> ${item.why}</p>
-        `;
-        grid.appendChild(card);
-      });
+    async function loadData() {
+      try {
+        const [config, catalog] = await Promise.all([
+          fetch(CONFIG_URL).then(r => r.json()),
+          fetch(CATALOG_URL).then(r => r.json())
+        ]);
+
+        const app = document.getElementById('app');
+        const grid = document.createElement('div');
+        grid.className = 'grid';
+
+        catalog.categories.forEach(cat => {
+          cat.items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <h2>${item.number} – ${item.title}</h2>
+              <p>${item.subtitle || ''}</p>
+            `;
+            grid.appendChild(card);
+          });
+        });
+
+        app.appendChild(grid);
+
+      } catch (err) {
+        console.error('Načítání JSON selhalo:', err);
+        document.body.insertAdjacentHTML('afterbegin',
+          '<div style="padding:12px;background:#ffe0e0;color:#900;">Nelze načíst data (config.json / catalog.json).</div>'
+        );
+      }
     }
 
     loadData();
   </script>
 </body>
 </html>
+
