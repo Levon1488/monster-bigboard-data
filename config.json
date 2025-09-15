@@ -1,0 +1,69 @@
+{
+  "app_title": "Digitální Tržiště",
+  "public": true,
+  "version": "2025-09-15T00:00:00Z",
+  "ui": {
+    "layout": {
+      "fixed": true,
+      "grid": {
+        "columns": 12,
+        "gutter": 16
+      },
+      "canvas": {
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    "zoom": {
+      "enabled": true,
+      "min": 0.5,
+      "max": 2.0,
+      "step": 0.1,
+      "default": 1.0
+    },
+    "header": {
+      "title": "Digitální Tržiště",
+      "show_search": true
+    },
+    "sidebar": {
+      "visible": true,
+      "position": "left",
+      "width": 320,
+      "show_category_map": true,
+      "pinned": true
+    },
+    "cards": {
+      "min_width": 260,
+      "max_width": 360,
+      "row_height": 140
+    }
+    ,
+    "icons": {
+      "base_url": "/assets/icons/",
+      "fallback": "default.svg"
+    }
+  },
+  "bot": {
+    "enabled": true,
+    "intro_text": "Napiš své křestní jméno a e-mail. Odpovím ti a můžeš se mnou chatovat.",
+    "fields": [
+      { "name": "first_name", "label": "Křestní jméno", "type": "text", "required": true },
+      { "name": "email", "label": "E-mail", "type": "email", "required": true }
+    ],
+    "consent_text": "Souhlasím se zpracováním kontaktních údajů pro účely komunikace.",
+    "submit_label": "Začít chat",
+    "api_endpoint": "/api/leads", 
+    "chat_endpoint": "/api/chat",   
+    "success_message": "Díky! Jdeme na to — napiš, s čím potřebuješ pomoct.",
+    "privacy_note_url": "/privacy"
+  },
+  "data_sources": {
+    "catalog_url": "/data/catalog.json",
+    "poll_interval_ms": 30000,
+    "cache_control": "no-store"
+  },
+  "categories_order": [
+    "Úvod",
+    "Aplikace"
+  ]
+}

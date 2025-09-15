@@ -1,0 +1,94 @@
+{
+  "categories": [
+    {
+      "key": "Úvod",
+      "title": "Úvod",
+      "description": "Rychlý přehled, co to je a jak to používat.",
+      "items": [
+        {
+          "id": "uvod-001",
+          "order": 1,
+          "number": "Ú-01",
+          "title": "Co je Digitální Tržiště",
+          "subtitle": "Krátké vysvětlení pro nově příchozí",
+          "icon": "intro/book-open.svg",
+          "url": null,
+          "tags": ["intro", "návod"],
+          "layout": { "col": 1, "row": 1, "w": 4, "h": 2 },
+          "pinned": true
+        },
+        {
+          "id": "uvod-002",
+          "order": 2,
+          "number": "Ú-02",
+          "title": "Jak přidávat položky",
+          "subtitle": "Přidáš řádek do JSONu, nic víc",
+          "icon": "intro/plus.svg",
+          "url": null,
+          "tags": ["workflow"],
+          "layout": { "col": 5, "row": 1, "w": 4, "h": 2 }
+        },
+        {
+          "id": "uvod-003",
+          "order": 3,
+          "number": "Ú-03",
+          "title": "Kontakt přes bota",
+          "subtitle": "Napiš jméno a e-mail, otevře se chat",
+          "icon": "intro/chat.svg",
+          "url": "#open-bot",
+          "tags": ["chat", "bot"],
+          "layout": { "col": 9, "row": 1, "w": 4, "h": 2 }
+        }
+      ]
+    },
+    {
+      "key": "Aplikace",
+      "title": "Aplikace",
+      "description": "Katalog nástrojů a aplikací.",
+      "items": [
+        {
+          "id": "app-001",
+          "order": 1,
+          "number": "A-01",
+          "title": "Reality Scan – Vyhledávač",
+          "subtitle": "AI analýza inzerátů, scoring, export",
+          "icon": "apps/scan.svg",
+          "url": "https://example.com/reality-scan",
+          "tags": ["AI", "realitní"],
+          "layout": { "col": 1, "row": 4, "w": 4, "h": 2 }
+        },
+        {
+          "id": "app-002",
+          "order": 2,
+          "number": "A-02",
+          "title": "StarterPack Family – Konfigurátor",
+          "subtitle": "Volba modelu, výbavy, export nabídky",
+          "icon": "apps/house.svg",
+          "url": "https://example.com/spf-config",
+          "tags": ["domy", "konfigurátor"],
+          "layout": { "col": 5, "row": 4, "w": 4, "h": 2 }
+        },
+        {
+          "id": "app-003",
+          "order": 3,
+          "number": "A-03",
+          "title": "CzechAI – Automatizace pro firmy",
+          "subtitle": "Chatboty, integrace, AI skripty",
+          "icon": "apps/czechai.svg",
+          "url": "https://example.com/czechai",
+          "tags": ["AI", "automatizace"],
+          "layout": { "col": 9, "row": 4, "w": 4, "h": 2 }
+        }
+      ]
+    }
+  ],
+  "icons_gallery": [
+    { "name": "book-open", "path": "intro/book-open.svg", "tags": ["úvod","návod"] },
+    { "name": "plus", "path": "intro/plus.svg", "tags": ["přidat","nové"] },
+    { "name": "chat", "path": "intro/chat.svg", "tags": ["chat","komunikace"] },
+    { "name": "scan", "path": "apps/scan.svg", "tags": ["AI","analýza"] },
+    { "name": "house", "path": "apps/house.svg", "tags": ["dům","konfigurátor"] },
+    { "name": "czechai", "path": "apps/czechai.svg", "tags": ["AI","firma"] },
+    { "name": "default", "path": "default.svg", "tags": [] }
+  ]
+}
